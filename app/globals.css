@@ -1,26 +1,174 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── Minted Whimsy Design Tokens ─────────────────────────────────────────── */
+@theme {
+  /* Brand Palette — matching reference screenshots */
+  --color-cream:        #FDE2EE;
+  --color-pink-soft:    #FCE7F3;
+  --color-pink-light:   #FFB6C1;
+  --color-pink-mid:     #FFA0B4;
+  --color-pink-hot:     #FF7096;
+  --color-rose:         #E0659B;
+  --color-rose-dark:    #C2185B;
+  --color-peach:        #FFF0F5;
+  --color-charcoal:     #2B2B2B;
+  --color-muted:        #8A7D7D;
+  --color-success:      #10B981;
+  --color-white:        #FFFFFF;
+  --color-footer:       #2A272A;
+
+  /* Semantic */
+  --color-background:   #FDE2EE;
+  --color-foreground:   #2B2B2B;
+  --color-primary:      #FF7096;
+  --color-accent:       #E0659B;
+  --color-surface:      #FFFFFF;
+
+  /* Typography */
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body:    "Poppins", system-ui, sans-serif;
+
+  /* Shadows */
+  --shadow-card:  0 4px 20px rgba(244, 143, 177, 0.16);
+  --shadow-hover: 0 8px 30px rgba(233, 30, 140, 0.22);
+  --shadow-btn:   0 4px 14px rgba(255, 112, 150, 0.40);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ── Base ──────────────────────────────────────────────────── */
+@layer base {
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+  body {
+    background-color: #FDE2EE;
+    color: #2B2B2B;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.65;
+    min-height: 100dvh;
+  }
+  h1,h2,h3,h4,h5,h6 { font-family: var(--font-body); line-height: 1.25; font-weight: 700; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+  input, select, textarea { font-family: inherit; }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Container ─────────────────────────────────────────────── */
+.container,
+.section-container {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .container,
+  .section-container {
+    padding-inline: 2rem;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Blushy Cards ──────────────────────────────────────────── */
+.card, .blushy-card {
+  background: #FFFFFF;
+  border-radius: 1.75rem;
+  border: 1.5px solid #FFD6E5;
+  box-shadow: 0 4px 20px rgba(244, 143, 177, 0.14);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.card:hover, .blushy-card:hover {
+  box-shadow: 0 10px 32px rgba(233, 30, 140, 0.20);
+  transform: translateY(-5px);
+  border-color: #FFB6C1;
+}
+
+/* ── Blushy Pill Button ────────────────────────────────────── */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 9999px;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #FFA0B4 0%, #FF7096 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(255, 112, 150, 0.38);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #FF8DA1 0%, #E0659B 100%);
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 20px rgba(224, 101, 155, 0.48);
+}
+.btn-outline {
+  background: white;
+  color: #FF7096;
+  border: 2px solid #FFA0B4;
+}
+.btn-outline:hover {
+  background: #FCE7F3;
+  border-color: #FF7096;
+}
+
+/* ── Blushy Section Title ─────────────────────────────────── */
+.blushy-section-title {
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #FF7096;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  letter-spacing: -0.01em;
+}
+.blushy-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin: 0.45rem auto 0.25rem;
+}
+.blushy-divider-line {
+  width: 44px;
+  height: 1.5px;
+  background-color: #F8A5C2;
+  border-radius: 999px;
+}
+.blushy-divider-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #FF7096;
+  transform: rotate(45deg);
+  border-radius: 1px;
+}
+.blushy-section-subtitle {
+  text-align: center;
+  color: #8A7D7D;
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+/* ── Marquee ───────────────────────────────────────────────── */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 22s linear infinite; display: flex; gap: 0; }
+.marquee-track:hover { animation-play-state: paused; }
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #FDE2EE; }
+::-webkit-scrollbar-thumb { background: #FFA0B4; border-radius: 999px; }
+
+/* ── Focus ─────────────────────────────────────────────────── */
+:focus-visible { outline: 2px solid #FF7096; outline-offset: 2px; }
