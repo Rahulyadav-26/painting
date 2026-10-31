@@ -4,14 +4,15 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Trash2, ShoppingBag, ArrowRight, ArrowLeft, Tag, ShieldCheck, Sparkles } from "lucide-react";
+import { Trash2, ShoppingBag, ArrowRight, ArrowLeft, Tag, ShieldCheck, Sparkles, LogIn } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
 import { useToastStore } from "@/store/toastStore";
 import { formatPrice } from "@/lib/utils";
 
-const FREE_SHIPPING_THRESHOLD = 5000;
-const STANDARD_SHIPPING_FEE = 350;
+const FREE_SHIPPING_THRESHOLD = 35;
+const STANDARD_SHIPPING_FEE = 5;
 
 export default function CartPage() {
   const router = useRouter();
@@ -20,11 +21,13 @@ export default function CartPage() {
   const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; percent?: number; flat?: number } | null>(null);
 
   const { items, updateQuantity, removeItem, clearCart, totalPrice } = useCartStore();
+  const { isAuthenticated, checkAuth } = useAuthStore();
   const addToast = useToastStore((s) => s.addToast);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    checkAuth();
+  }, [checkAuth]);
 
   if (!mounted) {
     return (
@@ -62,8 +65,8 @@ export default function CartPage() {
       setAppliedDiscount({ code: "WHIMSY10", percent: 10 });
       addToast("Coupon 'WHIMSY10' applied! 10% discount added. ✨", "success");
     } else if (code === "FIRSTART") {
-      setAppliedDiscount({ code: "FIRSTART", flat: 500 });
-      addToast("Coupon 'FIRSTART' applied! ₹500 discount added. ✨", "success");
+      setAppliedDiscount({ code: "FIRSTART", flat: 3 });
+      addToast("Coupon 'FIRSTART' applied! $3 discount added. ✨", "success");
     } else if (code === "ARTLOVE") {
       setAppliedDiscount({ code: "ARTLOVE", percent: 15 });
       addToast("Coupon 'ARTLOVE' applied! 15% discount added. ✨", "success");
@@ -322,12 +325,34 @@ export default function CartPage() {
                   </div>
 
                   <button
-                    onClick={() => router.push("/checkout")}
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        addToast("Please sign in or create an account to proceed to checkout", "info");
+                        router.push("/login?redirect=/checkout");
+                      } else {
+                        router.push("/checkout");
+                      }
+                    }}
                     className="btn-pill btn-primary w-full py-3.5 text-sm flex items-center justify-center gap-2 mt-2 shadow-lg"
                   >
-                    Proceed to Checkout
-                    <ArrowRight size={16} />
+                    {isAuthenticated ? (
+                      <>
+                        <span>Proceed to Checkout</span>
+                        <ArrowRight size={16} />
+                      </>
+                    ) : (
+                      <>
+                        <LogIn size={16} />
+                        <span>Sign In & Proceed to Checkout</span>
+                      </>
+                    )}
                   </button>
+
+                  {!isAuthenticated && (
+                    <p className="text-[11px] text-center text-[#FF7096] font-medium">
+                      Authentication required to assign official Certificate of Authenticity
+                    </p>
+                  )}
 
                   <div className="pt-2 text-[11px] text-gray-500 flex items-center justify-center gap-1.5 text-center">
                     <ShieldCheck size={14} className="text-[#3FA66B]" />

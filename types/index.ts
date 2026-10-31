@@ -1,6 +1,11 @@
 // ─── Product Types ──────────────────────────────────────────────────────────
 
 export type ProductCategory =
+  | "Daily Planner"
+  | "Planner"
+  | "Notes"
+  | "Stickers"
+  | "Coloring pages"
   | "Abstract"
   | "Landscape"
   | "Portrait"
@@ -11,6 +16,7 @@ export type ProductCategory =
   | "Spiritual";
 
 export type ProductMedium =
+  | "Digital Printable / Tablet PDF"
   | "Oil on Canvas"
   | "Watercolour"
   | "Acrylic"
@@ -20,6 +26,7 @@ export type ProductMedium =
   | "Mixed Media";
 
 export type ProductSize =
+  | "Digital (A4 / US Letter / Tablet)"
   | "A4 (21×30 cm)"
   | "A3 (30×42 cm)"
   | "8×10 in"
@@ -41,6 +48,7 @@ export interface Product {
   salePrice?: number;
   isNew: boolean;
   inStock: boolean;
+  isComingSoon?: boolean;
   images: string[];
   description: string;
   tags: string[];
@@ -92,3 +100,25 @@ export interface ToastStore {
 export type ButtonVariant = "primary" | "secondary" | "ghost";
 export type ButtonSize = "sm" | "md" | "lg";
 export type BadgeVariant = "new" | "sale" | "sold" | "hot";
+
+// ─── User & Auth Types ───────────────────────────────────────────────────────
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  avatar?: string | null;
+  createdAt?: string | Date;
+}
+
+export interface AuthState {
+  user: AuthUser | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  checkAuth: () => Promise<void>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
+}
+

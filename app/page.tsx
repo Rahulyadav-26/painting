@@ -2,15 +2,14 @@
 
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
-import HeroSection from "@/components/home/HeroSection";
-import FeaturedProducts from "@/components/home/FeaturedProducts";
-import CuratorSpotlight from "@/components/home/CuratorSpotlight";
-import CategoryGrid from "@/components/home/CategoryGrid";
-import ShopByPrice from "@/components/home/ShopByPrice";
-import AllProductsSection from "@/components/home/AllProductsSection";
-import PerksBar from "@/components/home/PerksBar";
-import TestimonialsSection from "@/components/home/TestimonialsSection";
-import NewsletterSection from "@/components/home/NewsletterSection";
+import WhimsicalHero from "@/components/home/WhimsicalHero";
+import WhimsicalAbout from "@/components/home/WhimsicalAbout";
+import WhimsicalProducts from "@/components/home/WhimsicalProducts";
+import DailyPlannerSection from "@/components/home/DailyPlannerSection";
+import WhimsicalProcess from "@/components/home/WhimsicalProcess";
+import WhimsicalTestimonials from "@/components/home/WhimsicalTestimonials";
+import WhimsicalPromoBanners from "@/components/home/WhimsicalPromoBanners";
+import WhimsicalContact from "@/components/home/WhimsicalContact";
 import QuickViewModal from "@/components/product/QuickViewModal";
 import type { Product } from "@/types";
 
@@ -19,32 +18,29 @@ export default function HomePage() {
 
   return (
     <MainLayout>
-      {/* 1. Grand Editorial Hero: Where Rare Artistry Meets Whimsical Living */}
-      <HeroSection />
+      {/* 1. Whimsical Hero: "Whimsical art for dreamers & kind hearts" */}
+      <WhimsicalHero />
 
-      {/* 2. Curated New Acquisitions: Filterable paintings with provenance badges */}
-      <FeaturedProducts onQuickView={setQuickViewProduct} />
+      {/* 2. About Atelier: "Artist. Storyteller. Daydreamer." */}
+      <WhimsicalAbout />
 
-      {/* 3. Curator's Atelier: The craft of mineral pigments & Belgian linen */}
-      <CuratorSpotlight />
+      {/* 3. Our Products: Planner, Notes, Stickers, Coloring pages */}
+      <WhimsicalProducts />
 
-      {/* 4. Explore by Artistic Genre: Visual art movement collections */}
-      <CategoryGrid />
+      {/* 4. Autumn Harvest Digital Daily Planner Spotlight & Mockup Showcase */}
+      <DailyPlannerSection />
 
-      {/* 5. Acquire by Collector Tier: Thoughtful art advisory pricing */}
-      <ShopByPrice />
+      {/* 5. Creative Process: "From idea to magic ♡" */}
+      <WhimsicalProcess />
 
-      {/* 6. The Collector's Archive: Full original paintings gallery */}
-      <AllProductsSection onQuickView={setQuickViewProduct} />
+      {/* 6. Kind Words: "What lovely people say ♡" */}
+      <WhimsicalTestimonials />
 
-      {/* 7. Studio Perks & Collector Assurance */}
-      <PerksBar />
+      {/* 7. Dual Promo Banners: Digital & Print highlights */}
+      <WhimsicalPromoBanners />
 
-      {/* 8. Collector Testimonials */}
-      <TestimonialsSection />
-
-      {/* 9. VIP Art Salon Newsletter */}
-      <NewsletterSection />
+      {/* 8. Get in Touch: "Let's stay in touch! ♡" with contact form */}
+      <WhimsicalContact />
 
       {/* Quick View Canvas Modal */}
       <QuickViewModal

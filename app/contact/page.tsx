@@ -39,11 +39,11 @@ export default function ContactPage() {
             <p className="text-[#4F4149] text-[15px] sm:text-base leading-relaxed">
               Email:{" "}
               <a
-                href="mailto:sharmadeeepsh123@gmail.com"
+                href="mailto:mintedwhimsy0@gmail.com"
                 style={{ color: "#3B5998", textDecoration: "underline" }}
                 className="hover:opacity-80 transition-opacity font-normal"
               >
-                sharmadeeepsh123@gmail.com
+                mintedwhimsy0@gmail.com
               </a>
             </p>
             <p className="text-[#4F4149] text-[15px] sm:text-base leading-relaxed">
@@ -54,6 +54,18 @@ export default function ContactPage() {
                 className="hover:opacity-80 transition-opacity font-normal"
               >
                 9926398315
+              </a>
+            </p>
+            <p className="text-[#4F4149] text-[15px] sm:text-base leading-relaxed">
+              Instagram:{" "}
+              <a
+                href="https://instagram.com/mintedwhimsy0"
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "#3B5998", textDecoration: "underline" }}
+                className="hover:opacity-80 transition-opacity font-normal"
+              >
+                @mintedwhimsy0
               </a>
             </p>
           </div>
@@ -84,8 +96,17 @@ export default function ContactPage() {
               Custom Orders
             </h2>
             <p className="text-[#4F4149] text-[15px] sm:text-base leading-relaxed mb-3">
-              Looking for a personalized handmade creation? Contact us via email or Instagram DM with
-              your requirements, and we&apos;ll be happy to discuss custom designs, colors, and special
+              Looking for a personalized handmade creation? Contact us via email or{" "}
+              <a
+                href="https://instagram.com/mintedwhimsy0"
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "#3B5998", textDecoration: "underline" }}
+                className="hover:opacity-80 transition-opacity font-medium"
+              >
+                Instagram DM (@mintedwhimsy0)
+              </a>{" "}
+              with your requirements, and we&apos;ll be happy to discuss custom designs, colors, and special
               requests.
             </p>
             <p className="text-[#4F4149] text-[15px] sm:text-base leading-relaxed">

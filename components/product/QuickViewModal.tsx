@@ -59,11 +59,16 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
               className="object-cover"
               sizes="320px"
             />
-            {discountPct && (
+            {product.isComingSoon ? (
+              <span className="absolute top-3 left-3 bg-gradient-to-r from-[#FF7096] to-[#E05D78] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase shadow-md flex items-center gap-1">
+                <Sparkles size={11} className="text-yellow-200" />
+                Coming Soon
+              </span>
+            ) : discountPct ? (
               <span className="absolute top-3 left-3 bg-[#FF5722] text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase">
                 {discountPct}% OFF
               </span>
-            )}
+            ) : null}
           </div>
 
           {/* Details */}
@@ -107,26 +112,49 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
             <div className="flex items-center gap-1.5 mt-1">
               <span
                 className={`w-2 h-2 rounded-full ${
-                  product.inStock ? "bg-[#10B981]" : "bg-gray-400"
+                  product.isComingSoon
+                    ? "bg-[#FF7096] animate-pulse"
+                    : product.inStock
+                    ? "bg-[#10B981]"
+                    : "bg-gray-400"
                 }`}
               />
               <span
                 className={`text-[11px] font-semibold ${
-                  product.inStock ? "text-[#10B981]" : "text-gray-400"
+                  product.isComingSoon
+                    ? "text-[#FF7096]"
+                    : product.inStock
+                    ? "text-[#10B981]"
+                    : "text-gray-400"
                 }`}
               >
-                {product.inStock ? "In Stock — Ready to ship" : "Sold Out"}
+                {product.isComingSoon
+                  ? "Coming Soon — In Creation ✨"
+                  : product.inStock
+                  ? "In Stock — Ready to ship"
+                  : "Sold Out"}
               </span>
             </div>
 
             <div className="flex items-center gap-3 pt-3">
-              <button
-                onClick={handleAddToCart}
-                disabled={!product.inStock}
-                className="btn-pill btn-primary flex-1 py-2.5 text-xs flex items-center justify-center gap-1.5"
-              >
-                <ShoppingCart size={14} /> Add to Cart
-              </button>
+              {product.isComingSoon ? (
+                <Link
+                  href={`/product/${product.slug}`}
+                  onClick={onClose}
+                  className="w-full py-2.5 px-4 rounded-full bg-gradient-to-r from-[#FFF0F4] to-[#FFE4EC] hover:from-[#FFE4EC] hover:to-[#FFD6E5] text-[#C23D5B] border border-[#F8BBD0] text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition-colors"
+                >
+                  <Sparkles size={13} className="text-[#E05D78]" />
+                  <span>Coming Soon • View Details</span>
+                </Link>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!product.inStock}
+                  className="btn-pill btn-primary flex-1 py-2.5 text-xs flex items-center justify-center gap-1.5"
+                >
+                  <ShoppingCart size={14} /> Add to Cart
+                </button>
+              )}
 
               <button
                 onClick={() => {

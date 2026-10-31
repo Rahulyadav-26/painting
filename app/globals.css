@@ -1,27 +1,27 @@
 @import "tailwindcss";
 
-/* ── Minted Whimsy Design Tokens ─────────────────────────────────────────── */
+/* ── Minted Whimsy Art & Atelier Design Tokens ───────────────────────── */
 @theme {
-  /* Brand Palette — matching reference screenshots */
-  --color-cream:        #FDE2EE;
-  --color-pink-soft:    #FCE7F3;
-  --color-pink-light:   #FFB6C1;
-  --color-pink-mid:     #FFA0B4;
-  --color-pink-hot:     #FF7096;
-  --color-rose:         #E0659B;
-  --color-rose-dark:    #C2185B;
-  --color-peach:        #FFF0F5;
-  --color-charcoal:     #2B2B2B;
-  --color-muted:        #8A7D7D;
+  /* Brand Palette — Minted Whimsy whimsical aesthetic */
+  --color-cream:        #FFFDFB;
+  --color-pink-soft:    #FFF0F3;
+  --color-pink-light:   #FCE2E8;
+  --color-pink-mid:     #F9A8B8;
+  --color-pink-hot:     #F67B92;
+  --color-rose:         #E05D78;
+  --color-rose-dark:    #C23D5B;
+  --color-peach:        #FFF5EE;
+  --color-charcoal:     #3D272B;
+  --color-muted:        #8C7378;
   --color-success:      #10B981;
   --color-white:        #FFFFFF;
-  --color-footer:       #2A272A;
+  --color-footer:       #FCE4EC;
 
   /* Semantic */
-  --color-background:   #FDE2EE;
-  --color-foreground:   #2B2B2B;
-  --color-primary:      #FF7096;
-  --color-accent:       #E0659B;
+  --color-background:   #FFF9F6;
+  --color-foreground:   #3D272B;
+  --color-primary:      #F67B92;
+  --color-accent:       #E05D78;
   --color-surface:      #FFFFFF;
 
   /* Typography */
@@ -29,17 +29,17 @@
   --font-body:    "Poppins", system-ui, sans-serif;
 
   /* Shadows */
-  --shadow-card:  0 4px 20px rgba(244, 143, 177, 0.16);
-  --shadow-hover: 0 8px 30px rgba(233, 30, 140, 0.22);
-  --shadow-btn:   0 4px 14px rgba(255, 112, 150, 0.40);
+  --shadow-card:  0 4px 20px rgba(246, 123, 146, 0.10);
+  --shadow-hover: 0 10px 30px rgba(224, 93, 120, 0.16);
+  --shadow-btn:   0 4px 14px rgba(246, 123, 146, 0.35);
 }
 
 /* ── Base ──────────────────────────────────────────────────── */
 @layer base {
   html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
   body {
-    background-color: #FDE2EE;
-    color: #2B2B2B;
+    background-color: #FFF9F6;
+    color: #3D272B;
     font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1.65;

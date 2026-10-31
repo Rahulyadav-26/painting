@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,6 +24,7 @@ import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useToastStore } from "@/store/toastStore";
+import { useAuthStore } from "@/store/authStore";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -41,6 +42,11 @@ export default function ProductDetailPage({ params }: PageProps) {
   const addItem = useCartStore((s) => s.addItem);
   const { toggle, has } = useWishlistStore();
   const addToast = useToastStore((s) => s.addToast);
+  const { isAuthenticated, checkAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   if (!product) {
     return (
@@ -80,7 +86,12 @@ export default function ProductDetailPage({ params }: PageProps) {
   const handleBuyNow = () => {
     if (!product.inStock) return;
     addItem(product, quantity);
-    router.push("/checkout");
+    if (!isAuthenticated) {
+      addToast("Please sign in or create an account to complete your purchase", "info");
+      router.push("/login?redirect=/checkout");
+    } else {
+      router.push("/checkout");
+    }
   };
 
   const handleShare = () => {
@@ -160,15 +171,24 @@ export default function ProductDetailPage({ params }: PageProps) {
 
                 {/* Badges */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
-                  {discountPct && (
-                    <span className="bg-[#FF69B4] text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-                      {discountPct}% OFF
+                  {product.isComingSoon ? (
+                    <span className="bg-gradient-to-r from-[#FF7096] to-[#E05D78] text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1.5 uppercase tracking-wider">
+                      <Sparkles size={12} className="text-yellow-200" />
+                      Coming Soon
                     </span>
-                  )}
-                  {product.isNew && (
-                    <span className="bg-[#D6657E] text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-                      NEW ORIGINAL
-                    </span>
+                  ) : (
+                    <>
+                      {discountPct && (
+                        <span className="bg-[#FF69B4] text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                          {discountPct}% OFF
+                        </span>
+                      )}
+                      {product.isNew && (
+                        <span className="bg-[#D6657E] text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                          NEW ORIGINAL
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -274,23 +294,67 @@ export default function ProductDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* Description Snippet */}
-              <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
+              {/* Description & Layout Details */}
+              <div className="bg-[#FFFDF9] rounded-2xl p-5 border border-[#F0E4D5] shadow-xs space-y-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#984A1A]">
+                  <Sparkles size={14} />
+                  <span>Product Details & Layout Breakdown</span>
+                </div>
+                <div className="text-xs text-gray-700 leading-relaxed whitespace-pre-line font-sans">
+                  {product.description}
+                </div>
+              </div>
 
-              {/* Stock status indicator */}
+              {/* Stock / Digital delivery status indicator */}
               <div className="flex items-center gap-2 text-xs">
                 <span
                   className={`w-2.5 h-2.5 rounded-full ${
-                    product.inStock ? "bg-emerald-500" : "bg-red-400"
+                    product.isComingSoon
+                      ? "bg-[#FF7096] animate-pulse"
+                      : product.inStock
+                      ? "bg-emerald-500 animate-pulse"
+                      : "bg-gray-400"
                   }`}
                 />
-                <span className="font-medium text-gray-700">
-                  {product.inStock ? "Available Now — Ready to dispatch" : "Currently Out of Stock"}
+                <span className="font-semibold text-gray-800">
+                  {product.isComingSoon
+                    ? "Coming Soon — Releasing Shortly ✨"
+                    : product.category === "Daily Planner"
+                    ? "Instant Digital Delivery — 100% Watermark Free"
+                    : product.inStock
+                    ? "Available Now — Ready to dispatch"
+                    : "Currently Out of Stock"}
                 </span>
               </div>
 
-              {/* Quantity & CTA Buttons */}
-              {product.inStock && (
+              {/* Quantity & CTA Buttons or Coming Soon Box */}
+              {product.isComingSoon ? (
+                <div className="bg-gradient-to-r from-[#FFF2F6] to-[#FFF8FA] border border-[#FFD6E5] rounded-3xl p-5 sm:p-6 text-center space-y-3 mt-1 shadow-xs">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFD6E5]/60 text-[#C23D5B] text-xs font-bold uppercase tracking-wider">
+                    <Sparkles size={12} className="text-[#FF7096]" />
+                    Coming Soon ♡
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-[#2B2329]">
+                    This collection is currently in creation!
+                  </h3>
+                  <p className="text-xs text-[#7A5A62] max-w-md mx-auto leading-relaxed">
+                    We are putting the final touches on this digital edition. Save it to your wishlist to be first in line when it drops!
+                  </p>
+                  <button
+                    onClick={() => {
+                      toggle(product.id);
+                      addToast(
+                        isWished ? "Removed from wishlist" : `"${product.title}" saved to your wishlist ♥`,
+                        isWished ? "info" : "success"
+                      );
+                    }}
+                    className="btn-pill btn-primary py-3 px-8 text-xs inline-flex items-center gap-2 uppercase tracking-wider font-bold mx-auto shadow-md"
+                  >
+                    <Heart size={14} className={isWished ? "fill-white" : ""} />
+                    {isWished ? "Saved in Wishlist ♥" : "Save to Wishlist & Notify Me"}
+                  </button>
+                </div>
+              ) : product.inStock ? (
                 <div className="flex flex-col gap-3 pt-2">
                   <div className="flex items-center gap-3">
                     <span className="text-xs font-semibold text-gray-600">Quantity:</span>
@@ -329,6 +393,10 @@ export default function ProductDetailPage({ params }: PageProps) {
                     </button>
                   </div>
                 </div>
+              ) : (
+                <div className="py-3 px-4 bg-gray-50 border border-gray-200 rounded-2xl text-xs text-gray-500 font-semibold text-center mt-2">
+                  This item is currently sold out.
+                </div>
               )}
 
               {/* Share button */}
@@ -342,24 +410,49 @@ export default function ProductDetailPage({ params }: PageProps) {
 
               {/* Trust Badges */}
               <div className="bg-white rounded-2xl p-4 border border-pink-100 flex flex-col gap-2.5 mt-2">
-                <div className="flex items-center gap-3 text-xs text-gray-700">
-                  <Truck size={16} className="text-[#D6657E] shrink-0" />
-                  <span>
-                    <strong>Free Shipping</strong> on orders above ₹5,000 across India.
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 text-xs text-gray-700">
-                  <ShieldCheck size={16} className="text-[#3FA66B] shrink-0" />
-                  <span>
-                    <strong>Signed Certificate of Authenticity</strong> included.
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 text-xs text-gray-700">
-                  <RotateCcw size={16} className="text-[#4A90D9] shrink-0" />
-                  <span>
-                    <strong>14-Day Return Guarantee</strong> with full collector refund.
-                  </span>
-                </div>
+                {product.category === "Daily Planner" ? (
+                  <>
+                    <div className="flex items-center gap-3 text-xs text-gray-700">
+                      <Truck size={16} className="text-[#984A1A] shrink-0" />
+                      <span>
+                        <strong>Instant Download</strong>: High-resolution file delivered immediately to your email.
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-gray-700">
+                      <ShieldCheck size={16} className="text-[#3FA66B] shrink-0" />
+                      <span>
+                        <strong>100% Watermark Free</strong>: Full high-resolution original digital file.
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-gray-700">
+                      <RotateCcw size={16} className="text-[#4A90D9] shrink-0" />
+                      <span>
+                        <strong>Tablet & Print Ready</strong>: Perfect for GoodNotes, Notability, or home printout.
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-3 text-xs text-gray-700">
+                      <Truck size={16} className="text-[#D6657E] shrink-0" />
+                      <span>
+                        <strong>Free Shipping</strong> on orders above $35.
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-gray-700">
+                      <ShieldCheck size={16} className="text-[#3FA66B] shrink-0" />
+                      <span>
+                        <strong>Signed Certificate of Authenticity</strong> included.
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-gray-700">
+                      <RotateCcw size={16} className="text-[#4A90D9] shrink-0" />
+                      <span>
+                        <strong>14-Day Return Guarantee</strong> with full collector refund.
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

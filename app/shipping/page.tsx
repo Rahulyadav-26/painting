@@ -38,12 +38,12 @@ export default function ShippingPage() {
                 <h2 className="text-lg font-bold text-gray-900 mb-2">Delivery Timelines & Rates</h2>
                 <ul className="text-xs text-gray-600 space-y-2 leading-relaxed">
                   <li>
-                    <strong>Free Shipping Across India:</strong> Orders above ₹5,000 qualify for
-                    100% complimentary courier delivery via BlueDart and Delhivery Express.
+                    <strong>Free Shipping Worldwide:</strong> Orders above $35 qualify for
+                    100% complimentary tracked courier delivery.
                   </li>
                   <li>
-                    <strong>Standard Flat Rate:</strong> Orders under ₹5,000 are charged a flat ₹350
-                    for insured transit.
+                    <strong>Standard Flat Rate:</strong> Orders under $35 are charged a flat $5
+                    for insured transit. Digital goods are delivered instantly with $0 shipping.
                   </li>
                   <li>
                     <strong>Dispatch Time:</strong> Ready-to-ship paintings are inspected, varnished,

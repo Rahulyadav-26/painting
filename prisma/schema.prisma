@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  passwordHash String
+  role         String    @default("CUSTOMER")
+  avatar       String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  orders       Order[]
+}
+
+model Painting {
+  id             String      @id @default(cuid())
+  slug           String      @unique
+  title          String
+  artist         String
+  description    String?
+  price          Float
+  originalPrice  Float?
+  imageUrl       String
+  digitalFileUrl String?
+  isDigital      Boolean     @default(true)
+  dimensions     String?
+  medium         String?
+  inStock        Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  orderItems     OrderItem[]
+}
+
+model Order {
+  id                String      @id @default(cuid())
+  orderNumber       String      @unique
+  userId            String?
+  user              User?       @relation(fields: [userId], references: [id])
+  customerName      String
+  customerEmail     String
+  customerPhone     String?
+  totalAmount       Float
+  currency          String      @default("INR")
+  status            String      @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  razorpayOrderId   String?     @unique
+  razorpayPaymentId String?     @unique
+  razorpaySignature String?
+  digitalDelivered  Boolean     @default(false)
+  deliveredAt       DateTime?
+  items             OrderItem[]
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model OrderItem {
+  id             String    @id @default(cuid())
+  orderId        String
+  order          Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  paintingId     String?
+  painting       Painting? @relation(fields: [paintingId], references: [id])
+  title          String
+  price          Float
+  quantity       Int       @default(1)
+  digitalFileUrl String?
+}

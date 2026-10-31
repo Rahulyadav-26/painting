@@ -7,6 +7,13 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 const curatedGenres = [
   {
+    name: "Daily Planner & Lifestyle",
+    category: "Daily Planner",
+    description: "Autumn Harvest templates, wellness & hourly time-blocking",
+    count: "Digital Instant Download",
+    image: "/images/products/autumn-daily-planner-tablet-mockup.jpg",
+  },
+  {
     name: "Floral & Botanical",
     category: "Floral",
     description: "Lush peonies, sacred waterlilies & botanical oils",

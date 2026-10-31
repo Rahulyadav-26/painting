@@ -23,12 +23,12 @@ const faqs = [
     a: "All shipments are 100% insured. If any transit issue occurs, we immediately arrange full compensation or replacement. Furthermore, we offer a 14-day collector return policy if the piece does not harmonize with your home.",
   },
   {
-    q: "Can I commission a custom painting for my home?",
-    a: "Absolutely! Many of our artists accept custom size and theme commissions. Visit our Commissions page to submit your color palette, dimensions, and subject preferences.",
+    q: "How do I download and use my digital planners and sticker files?",
+    a: "Immediately upon checkout or payment verification, your high-resolution files are available for instant download and delivered to your email. You can import them directly into GoodNotes, Notability, or print them at home.",
   },
   {
     q: "Do you ship internationally outside India?",
-    a: "Yes, we ship internationally via DHL Express. Please contact sharmadeeepsh123@gmail.com with the piece you want and your destination country for international customs and shipping quotes.",
+    a: "Yes, we ship internationally via DHL Express. Please contact mintedwhimsy0@gmail.com with the piece you want and your destination country for international customs and shipping quotes.",
   },
   {
     q: "How do I care for and clean my painting?",

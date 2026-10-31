@@ -7,7 +7,7 @@ const perks = [
   {
     icon: Truck,
     title: "Free Shipping",
-    description: "Free delivery on orders above ₹5,000 across India.",
+    description: "Free delivery on orders above $35.",
     color: "#D6657E",
     bg: "#FFE3DC",
   },

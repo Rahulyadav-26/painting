@@ -29,7 +29,7 @@ export default function ProductCard({ product, index = 0, onQuickView }: Product
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!product.inStock) return;
+    if (!product.inStock || product.isComingSoon) return;
     addItem(product);
     addToast(`"${product.title}" added to your collection! 🎨`, "success");
   };
@@ -66,11 +66,18 @@ export default function ProductCard({ product, index = 0, onQuickView }: Product
             {/* Subtle Canvas Grain / Ambient Frame Vignette */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none opacity-60 group-hover:opacity-40 transition-opacity" />
 
-            {/* 1 of 1 Original Provenance Badge (Top-left) */}
-            <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-white/95 backdrop-blur-md text-[#2B2329] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm z-10 uppercase tracking-wider border border-[#FFD6E5]">
-              <Sparkles size={10} className="text-[#FF7096]" />
-              <span>Original 1 of 1</span>
-            </div>
+            {/* Top-left Badge: Coming Soon or Provenance */}
+            {product.isComingSoon ? (
+              <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-gradient-to-r from-[#FF7096] to-[#E05D78] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md z-10 uppercase tracking-wider border border-white/30">
+                <Sparkles size={10} className="text-yellow-200" />
+                <span>Coming Soon</span>
+              </div>
+            ) : (
+              <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-white/95 backdrop-blur-md text-[#2B2329] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm z-10 uppercase tracking-wider border border-[#FFD6E5]">
+                <Sparkles size={10} className="text-[#FF7096]" />
+                <span>{product.category === "Daily Planner" ? "Digital Planner" : "Original 1 of 1"}</span>
+              </div>
+            )}
 
             {/* Sale Ribbon Tag if applicable */}
             {discountPct && (
@@ -108,12 +115,12 @@ export default function ProductCard({ product, index = 0, onQuickView }: Product
                 className="btn-pill bg-white text-[#2B2329] hover:bg-[#FDE2EE] text-[11px] font-bold px-4 py-2 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-1.5"
               >
                 <Eye size={12} className="text-[#FF7096]" />
-                Inspect Canvas
+                {product.isComingSoon ? "Preview Details" : "Inspect Canvas"}
               </button>
             </div>
 
-            {/* Sold Out Overlay */}
-            {!product.inStock && (
+            {/* Sold Out Overlay (only if out of stock and NOT coming soon) */}
+            {!product.inStock && !product.isComingSoon && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px] z-10">
                 <span className="text-xs font-bold uppercase tracking-wider rounded-full px-4 py-1.5 text-white bg-[#C2185B] shadow-md">
                   Acquired / Sold
@@ -162,28 +169,48 @@ export default function ProductCard({ product, index = 0, onQuickView }: Product
                 )}
               </div>
 
-              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                Certified
-              </span>
+              {product.isComingSoon ? (
+                <span className="text-[10px] font-bold text-[#C23D5B] bg-[#FFF0F4] border border-[#FFD6E5] px-2 py-0.5 rounded-md">
+                  Coming Soon
+                </span>
+              ) : (
+                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                  Certified
+                </span>
+              )}
             </div>
           </div>
         </Link>
 
-        {/* Add to Collection Button */}
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={handleAddToCart}
-          disabled={!product.inStock}
-          aria-label={`Add ${product.title} to cart`}
-          className="btn-pill btn-primary w-full mt-3 text-xs py-2.5 justify-center shadow-xs uppercase tracking-wider font-bold"
-          style={{
-            opacity: product.inStock ? 1 : 0.5,
-            cursor: product.inStock ? "pointer" : "not-allowed",
-          }}
-        >
-          <ShoppingBag size={13} />
-          {product.inStock ? "Acquire Painting" : "Sold Out"}
-        </motion.button>
+        {/* Action Button: Coming Soon Link or Add to Collection */}
+        {product.isComingSoon ? (
+          <Link
+            href={`/product/${product.slug}`}
+            className="w-full mt-3 py-2.5 px-4 rounded-full bg-gradient-to-r from-[#FFF0F4] to-[#FFE4EC] hover:from-[#FFE4EC] hover:to-[#FFD6E5] text-[#C23D5B] border border-[#F8BBD0] text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition-colors"
+          >
+            <Sparkles size={13} className="text-[#E05D78]" />
+            <span>Coming Soon</span>
+          </Link>
+        ) : (
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={handleAddToCart}
+            disabled={!product.inStock}
+            aria-label={`Add ${product.title} to cart`}
+            className="btn-pill btn-primary w-full mt-3 text-xs py-2.5 justify-center shadow-xs uppercase tracking-wider font-bold"
+            style={{
+              opacity: product.inStock ? 1 : 0.5,
+              cursor: product.inStock ? "pointer" : "not-allowed",
+            }}
+          >
+            <ShoppingBag size={13} />
+            {product.inStock
+              ? product.category === "Daily Planner" || product.category === "Planner"
+                ? "Get Planner"
+                : "Acquire Painting"
+              : "Sold Out"}
+          </motion.button>
+        )}
       </div>
     </motion.article>
   );

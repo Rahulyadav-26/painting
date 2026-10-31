@@ -107,7 +107,7 @@ export default function HeroSection() {
                 </div>
                 <div>
                   <p className="text-2xl sm:text-3xl font-black text-white" style={{ fontFamily: "var(--font-display)" }}>
-                    ₹0
+                    $0
                   </p>
                   <p className="text-[11px] text-white/70 uppercase tracking-wider font-medium mt-0.5">
                     Gallery Markups
@@ -167,7 +167,7 @@ export default function HeroSection() {
                   <div className="flex items-center justify-between pt-3 border-t border-white/15">
                     <div>
                       <p className="text-[10px] text-white/60 uppercase">Collector Price</p>
-                      <p className="text-base font-bold text-white">₹8,500</p>
+                      <p className="text-base font-bold text-white">$9</p>
                     </div>
                     <Link
                       href="/product/blushing-peonies"

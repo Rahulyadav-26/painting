@@ -1,11 +1,12 @@
 /**
- * Format a price in INR with the ₹ symbol.
+ * Format a price in USD with the $ symbol.
  */
 export const formatPrice = (amount: number): string =>
-  new Intl.NumberFormat("en-IN", {
+  new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
+    currency: "USD",
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
   }).format(amount);
 
 /**

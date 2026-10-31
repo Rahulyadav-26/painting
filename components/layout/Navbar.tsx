@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Heart, Search, Menu, X, ChevronDown, User } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
+import { useAuthStore } from "@/store/authStore";
 
 /* ── Announcement bar items ── */
 const announcements = [
@@ -18,7 +19,8 @@ const announcements = [
 
 /* ── Nav links ── */
 const shopLinks = [
-  { href: "/shop", label: "All Paintings" },
+  { href: "/shop?category=Daily%20Planner", label: "🗓️ Daily Planner (Featured)" },
+  { href: "/shop", label: "All Products" },
   { href: "/shop?category=Abstract", label: "Abstract" },
   { href: "/shop?category=Floral", label: "Floral" },
   { href: "/shop?category=Landscape", label: "Landscape" },
@@ -39,13 +41,17 @@ export default function Navbar() {
 
   const totalItems = useCartStore((s) => s.totalItems());
   const wishlistCount = useWishlistStore((s) => s.ids.length);
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const checkAuth = useAuthStore((s) => s.checkAuth);
 
   useEffect(() => {
     setMounted(true);
+    checkAuth();
     const handler = () => setScrolled(window.scrollY > 8);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
-  }, []);
+  }, [checkAuth]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,88 +92,73 @@ export default function Navbar() {
       >
         <div className="container">
           <div className="flex items-center justify-between h-16 sm:h-18 gap-3">
-            {/* Logo: Bunny Face + Editorial "Minted Whimsy" */}
+            {/* Logo: "Minted Whimsy ♡ • ILLUSTRATION & ART" */}
             <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-              <span className="text-2xl sm:text-3xl transform group-hover:scale-110 transition-transform">
-                🐰
-              </span>
               <div className="flex flex-col">
-                <span
-                  style={{ fontFamily: "var(--font-display)" }}
-                  className="text-xl sm:text-2xl font-bold text-[#2B2329] tracking-tight group-hover:text-[#FF7096] transition-colors"
-                >
-                  Minted Whimsy
+                <span className="text-2xl sm:text-3xl font-serif font-bold text-[#3D272B] tracking-tight flex items-center gap-1.5 group-hover:text-[#E05D78] transition-colors">
+                  <span className="italic">Minted Whimsy</span>
+                  <span className="text-xs text-[#E05D78]">♡</span>
                 </span>
-                <span className="text-[9px] uppercase tracking-[0.22em] text-[#A87B8A] font-semibold -mt-1 hidden sm:block">
-                  Fine Art Collective
+                <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.26em] text-[#9E7A82] font-bold -mt-0.5">
+                  Illustration &amp; Art
                 </span>
               </div>
             </Link>
 
-            {/* Center Nav — desktop */}
-            <nav className="hidden md:flex items-center gap-1.5">
-              {/* Home Pill Button */}
+            {/* Center Nav — matching screenshot */}
+            <nav className="hidden lg:flex items-center gap-1">
               <Link
                 href="/"
-                className="btn-pill btn-primary text-xs px-5 py-2 font-bold shadow-sm"
+                className="text-[11px] font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full text-[#E05D78] bg-[#FCE5EB]"
               >
                 Home
               </Link>
-
-              {/* Shop Dropdown */}
-              <div
-                className="relative"
-                onMouseEnter={() => setShopOpen(true)}
-                onMouseLeave={() => setShopOpen(false)}
-              >
-                <button
-                  className="flex items-center gap-1 text-xs font-semibold px-4 py-2 rounded-full hover:bg-pink-50 transition-colors text-gray-700"
-                >
-                  🛍️ Shop
-                  <ChevronDown
-                    size={14}
-                    className={`transition-transform text-[#FF7096] ${shopOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-                <AnimatePresence>
-                  {shopOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.97 }}
-                      transition={{ duration: 0.18 }}
-                      className="absolute top-full left-0 mt-2 w-52 rounded-3xl shadow-xl border border-pink-100 py-2.5 z-50 bg-white"
-                    >
-                      {shopLinks.map((link) => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className="block px-5 py-2 text-xs font-medium text-gray-700 hover:bg-pink-50 hover:text-[#FF7096] transition-colors"
-                        >
-                          {link.label}
-                        </Link>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
               <Link
-                href="/about"
-                className="flex items-center gap-1 text-xs font-semibold px-4 py-2 rounded-full hover:bg-pink-50 transition-colors text-gray-700"
+                href="#about"
+                className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full text-[#5C4047] hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors"
               >
-                ♥ About
+                About
               </Link>
               <Link
-                href="/contact"
-                className="flex items-center gap-1 text-xs font-semibold px-4 py-2 rounded-full hover:bg-pink-50 transition-colors text-gray-700"
+                href="/#products"
+                className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full text-[#5C4047] hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors"
               >
-                ✉️ Contact
+                Products
+              </Link>
+              <Link
+                href="/shop?category=Daily%20Planner"
+                className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full text-[#9A4E1B] bg-[#FFF0E2] border border-[#F0D5C0] hover:bg-[#FFE5D0] transition-colors flex items-center gap-1"
+              >
+                <span>Daily Planner</span>
+                <span className="text-[8px] bg-[#9A4E1B] text-white px-1.5 rounded-full font-black">
+                  New
+                </span>
+              </Link>
+              <Link
+                href="/shop"
+                className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full text-[#5C4047] hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors"
+              >
+                Shop
+              </Link>
+              <Link
+                href="/#contact"
+                className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full text-[#5C4047] hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors"
+              >
+                Contact
               </Link>
             </nav>
 
-            {/* Right Action Icons (Matches Screenshot 1 & 2) */}
+            {/* Right Action Icons (Matches Screenshot) */}
             <div className="flex items-center gap-2">
+              {/* Shop Goodies Pill Button */}
+              <Link
+                href="/shop"
+                className="hidden sm:inline-flex items-center gap-1.5 py-2 px-4 rounded-full bg-gradient-to-r from-[#F67B92] to-[#EE6580] hover:from-[#EE6580] hover:to-[#D9536E] text-white font-bold text-[11px] uppercase tracking-wider shadow-sm hover:shadow-md transition-all shrink-0"
+              >
+                <span>Shop Goodies</span>
+                <span>♡</span>
+              </Link>
+
               {/* Search Toggle */}
               <button
                 onClick={() => setSearchOpen((v) => !v)}
@@ -191,13 +182,22 @@ export default function Navbar() {
                 )}
               </Link>
 
-              {/* User Account Button (Round white button with thin pink border) */}
+              {/* User Account Button (Dynamic login / profile indicator) */}
               <Link
-                href="/account"
-                aria-label="Account"
-                className="w-9 h-9 flex items-center justify-center rounded-full border border-pink-200 bg-white text-[#FF7096] hover:bg-pink-50 transition-colors"
+                href={isAuthenticated ? "/account" : "/login"}
+                aria-label={isAuthenticated ? "Account" : "Sign In"}
+                title={isAuthenticated ? (user?.name ? `${user.name}'s Account` : "My Account") : "Sign In"}
+                className={`w-9 h-9 flex items-center justify-center rounded-full border transition-all text-xs font-bold ${
+                  mounted && isAuthenticated
+                    ? "border-[#FF7096] bg-pink-50 text-[#FF7096] shadow-xs"
+                    : "border-pink-200 bg-white text-gray-600 hover:bg-pink-50 hover:text-[#FF7096]"
+                }`}
               >
-                <User size={16} />
+                {mounted && isAuthenticated && user?.name ? (
+                  <span>{user.name.charAt(0).toUpperCase()}</span>
+                ) : (
+                  <User size={16} />
+                )}
               </Link>
 
               {/* Cart Button (Solid Pink Circle with Shopping Bag Icon) */}
@@ -311,6 +311,18 @@ export default function Navbar() {
                 className="px-4 py-2.5 rounded-xl text-xs font-semibold text-gray-800 hover:bg-pink-50"
               >
                 ✉️ Contact
+              </Link>
+              <Link
+                href={isAuthenticated ? "/account" : "/login"}
+                onClick={() => setMobileOpen(false)}
+                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-gray-800 hover:bg-pink-50 flex items-center justify-between border-t border-pink-50 mt-1 pt-3"
+              >
+                <span>👤 {mounted && isAuthenticated ? (user?.name || "My Account") : "Sign In / Join Atelier"}</span>
+                {mounted && isAuthenticated && (
+                  <span className="text-[10px] bg-pink-100 text-[#FF7096] px-2 py-0.5 rounded-full font-bold">
+                    Patron
+                  </span>
+                )}
               </Link>
             </div>
           </motion.nav>

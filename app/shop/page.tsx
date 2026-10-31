@@ -11,24 +11,15 @@ import type { ProductCategory, ProductMedium } from "@/types";
 
 const ALL_CATEGORIES: (ProductCategory | "All")[] = [
   "All",
-  "Abstract",
-  "Landscape",
-  "Portrait",
-  "Floral",
-  "Wildlife",
-  "Spiritual",
-  "Cityscape",
-  "Still Life",
+  "Daily Planner",
+  "Notes",
+  "Stickers",
+  "Coloring pages",
 ];
 
 const ALL_MEDIUMS: (ProductMedium | "All")[] = [
   "All",
-  "Oil on Canvas",
-  "Watercolour",
-  "Acrylic",
-  "Gouache",
-  "Ink",
-  "Mixed Media",
+  "Digital Printable / Tablet PDF",
 ];
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "rating" | "newest";
@@ -123,13 +114,13 @@ function ShopContent() {
         <div className="text-center mb-8">
           <h1
             style={{ fontFamily: "var(--font-body)" }}
-            className="text-3xl sm:text-4xl font-bold text-[#FF69B4] flex items-center justify-center gap-2"
+            className="text-3xl sm:text-4xl font-bold text-[#E05D78] flex items-center justify-center gap-2"
           >
-            🎨 Gallery Collection
+            ✨ Whimsical Atelier Shop
           </h1>
           <div className="section-dot mt-2" />
           <p className="section-subtitle mt-2 max-w-lg mx-auto">
-            Discover original paintings created with love by master Indian artists. Signed certificates included with every original.
+            Explore our collection of digital daily planners, cozy note sheets, sticker packs, and printable coloring pages created with love.
           </p>
         </div>
 

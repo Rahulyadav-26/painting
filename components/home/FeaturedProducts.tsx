@@ -12,7 +12,7 @@ interface FeaturedProductsProps {
   onQuickView?: (product: Product) => void;
 }
 
-const FILTER_TABS = ["All Curations", "Floral", "Landscape", "Abstract", "Spiritual"];
+const FILTER_TABS = ["All Curations", "Daily Planner", "Floral", "Landscape", "Abstract", "Spiritual"];
 
 export default function FeaturedProducts({ onQuickView }: FeaturedProductsProps) {
   const [activeTab, setActiveTab] = useState("All Curations");
