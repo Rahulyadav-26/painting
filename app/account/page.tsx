@@ -567,29 +567,42 @@ export default function AccountPage() {
           {/* Addresses Tab Content */}
           {activeTab === "addresses" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-3xl p-6 border border-pink-200 shadow-sm relative">
-                <span className="absolute top-4 right-4 text-[10px] font-bold text-[#FF7096] bg-pink-50 px-2.5 py-1 rounded-full border border-pink-100">
-                  Primary Address
-                </span>
-                <h3 className="font-bold text-sm text-gray-900 mb-2">Registered Atelier Shipping</h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  {latestShipping?.fullName || displayName}
-                  <br />
-                  {latestShipping?.address || "Flat 402, Lotus Residency, 12th Main Road"}
-                  <br />
-                  {latestShipping?.apartment ? `${latestShipping.apartment}, ` : "Indiranagar, "}
-                  {latestShipping?.city || "Bengaluru"},{" "}
-                  {latestShipping?.state || "Karnataka"} – {latestShipping?.pincode || "560038"}
-                  <br />
-                  Email: {user.email}
-                  {latestShipping?.phone && (
-                    <>
-                      <br />
-                      Phone: {latestShipping.phone}
-                    </>
-                  )}
-                </p>
-              </div>
+              {latestShipping ? (
+                <div className="bg-white rounded-3xl p-6 border border-pink-200 shadow-sm relative">
+                  <span className="absolute top-4 right-4 text-[10px] font-bold text-[#FF7096] bg-pink-50 px-2.5 py-1 rounded-full border border-pink-100">
+                    Primary Address
+                  </span>
+                  <h3 className="font-bold text-sm text-gray-900 mb-2">Registered Atelier Shipping</h3>
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    {latestShipping.fullName || displayName}
+                    <br />
+                    {latestShipping.address}
+                    {latestShipping.apartment && (
+                      <>
+                        <br />
+                        {latestShipping.apartment}
+                      </>
+                    )}
+                    <br />
+                    {latestShipping.city}, {latestShipping.state} – {latestShipping.pincode}
+                    <br />
+                    Email: {user.email}
+                    {latestShipping.phone && (
+                      <>
+                        <br />
+                        Phone: {latestShipping.phone}
+                      </>
+                    )}
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-3xl p-8 border border-dashed border-pink-200 text-center col-span-2">
+                  <p className="text-sm font-medium text-gray-700 mb-1">No Delivery Address Saved Yet</p>
+                  <p className="text-xs text-gray-400">
+                    Your shipping address will be automatically saved here once you enter it during checkout.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

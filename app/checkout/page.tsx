@@ -61,13 +61,13 @@ export default function CheckoutPage() {
 
   // Form states
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("+91 98765 43210");
+  const [phone, setPhone] = useState("");
   const [fullName, setFullName] = useState("");
-  const [address, setAddress] = useState("Flat 402, Lotus Residency, 12th Main Road");
-  const [apartment, setApartment] = useState("Indiranagar");
-  const [city, setCity] = useState("Bengaluru");
-  const [state, setState] = useState("Karnataka");
-  const [pincode, setPincode] = useState("560038");
+  const [address, setAddress] = useState("");
+  const [apartment, setApartment] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [pincode, setPincode] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("upi_qr");
 
   useEffect(() => {
@@ -728,6 +728,7 @@ export default function CheckoutPage() {
                       type="text"
                       value={apartment}
                       onChange={(e) => setApartment(e.target.value)}
+                      placeholder="e.g. Near City Center / Area name"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
                     />
                   </div>
@@ -739,6 +740,7 @@ export default function CheckoutPage() {
                       required
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
+                      placeholder="e.g. Mumbai"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
                     />
                   </div>
@@ -750,6 +752,7 @@ export default function CheckoutPage() {
                       required
                       value={state}
                       onChange={(e) => setState(e.target.value)}
+                      placeholder="e.g. Maharashtra"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
                     />
                   </div>
@@ -761,6 +764,7 @@ export default function CheckoutPage() {
                       required
                       value={pincode}
                       onChange={(e) => setPincode(e.target.value)}
+                      placeholder="e.g. 400001"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
                     />
                   </div>
