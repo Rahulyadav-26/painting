@@ -13,6 +13,7 @@ model User {
   passwordHash String
   role         String    @default("CUSTOMER")
   avatar       String?
+  tokenVersion Int       @default(1)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   orders       Order[]

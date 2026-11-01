@@ -1,6 +1,12 @@
 import { products } from "../data/products";
 import type { OrderItem } from "@/lib/orderService";
 
+export const USD_TO_INR_RATE = Number(process.env.NEXT_PUBLIC_USD_TO_INR_RATE) || 85;
+
+export const convertUsdToInr = (usdAmount: number, rate = USD_TO_INR_RATE): number => {
+  return Math.round(usdAmount * rate * 100) / 100;
+};
+
 export interface VerifiedOrderPricing {
   items: OrderItem[];
   subtotal: number;
@@ -52,9 +58,8 @@ export function calculateVerifiedOrderPricing(rawItems: any[]): VerifiedOrderPri
     return product?.category === "Daily Planner" || product?.medium?.includes("Digital");
   });
 
-  const qualifiesForFreeShipping = subtotal >= 35 || allDigital;
-  const shippingFee = subtotal === 0 || qualifiesForFreeShipping ? 0 : 5;
-  const totalPrice = subtotal + shippingFee;
+  const shippingFee = 0;
+  const totalPrice = subtotal;
 
   return {
     items,

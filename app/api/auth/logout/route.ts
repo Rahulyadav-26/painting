@@ -21,11 +21,15 @@ export async function POST(request: NextRequest) {
     message: "Logged out successfully",
   });
 
+  const isHttps = request.url.startsWith("https://") || request.headers.get("x-forwarded-proto") === "https";
+  const isLocalhost = request.headers.get("host")?.includes("localhost") || request.headers.get("host")?.includes("127.0.0.1");
+  const isSecure = !isLocalhost && (process.env.NODE_ENV === "production" || isHttps);
+
   response.cookies.set({
     name: COOKIE_NAME,
     value: "",
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isSecure,
     sameSite: "lax",
     path: "/",
     maxAge: 0,

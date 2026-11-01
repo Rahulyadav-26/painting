@@ -5,9 +5,16 @@ import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
   try {
-    // Rate Limiting (Fix for SEC-05): Max 5 registration requests per minute per IP
     const clientIp = getClientIp(request);
-    const rateCheck = checkRateLimit(`register:${clientIp}`, 5, 60 * 1000);
+    const isLocalhost =
+      clientIp === "127.0.0.1" ||
+      clientIp === "::1" ||
+      clientIp.includes("127.0.0.1") ||
+      clientIp === "localhost";
+    const maxAttempts =
+      process.env.NODE_ENV !== "production" || isLocalhost ? 50 : 10;
+
+    const rateCheck = checkRateLimit(`register:${clientIp}`, maxAttempts, 60 * 1000);
     if (!rateCheck.success) {
       return NextResponse.json(
         { error: `Too many registration attempts. Please wait ${rateCheck.resetInSeconds} seconds before retrying.` },
@@ -87,11 +94,14 @@ export async function POST(request: Request) {
       { status: 201 }
     );
 
+    const isHttps = request.url.startsWith("https://") || request.headers.get("x-forwarded-proto") === "https";
+    const isSecure = !isLocalhost && (process.env.NODE_ENV === "production" || isHttps);
+
     response.cookies.set({
       name: COOKIE_NAME,
       value: token,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isSecure,
       sameSite: "lax",
       path: "/",
       maxAge: SEVEN_DAYS_IN_SECONDS,

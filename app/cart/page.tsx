@@ -11,9 +11,6 @@ import { useAuthStore } from "@/store/authStore";
 import { useToastStore } from "@/store/toastStore";
 import { formatPrice } from "@/lib/utils";
 
-const FREE_SHIPPING_THRESHOLD = 35;
-const STANDARD_SHIPPING_FEE = 5;
-
 export default function CartPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -40,11 +37,6 @@ export default function CartPage() {
   }
 
   const rawSubtotal = totalPrice();
-  const qualifiesForFreeShipping = rawSubtotal >= FREE_SHIPPING_THRESHOLD;
-  const shippingFee = rawSubtotal === 0 || qualifiesForFreeShipping ? 0 : STANDARD_SHIPPING_FEE;
-  const amountNeededForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - rawSubtotal);
-  const shippingProgressPct = Math.min(100, Math.round((rawSubtotal / FREE_SHIPPING_THRESHOLD) * 100));
-
   let discountAmount = 0;
   if (appliedDiscount) {
     if (appliedDiscount.percent) {
@@ -54,7 +46,7 @@ export default function CartPage() {
     }
   }
 
-  const grandTotal = Math.max(0, rawSubtotal - discountAmount + shippingFee);
+  const grandTotal = Math.max(0, rawSubtotal - discountAmount);
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,24 +123,6 @@ export default function CartPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left Column: Cart Items (8 cols) */}
               <div className="lg:col-span-8 flex flex-col gap-4">
-                {/* Free Shipping Progress Card */}
-                <div className="bg-white p-4 rounded-2xl border border-pink-100 shadow-sm">
-                  <div className="flex items-center justify-between text-xs font-semibold mb-2">
-                    <span className="flex items-center gap-1.5 text-gray-700">
-                      <Sparkles size={14} className="text-[#FF69B4]" />
-                      {qualifiesForFreeShipping
-                        ? "🎉 Congratulations! You unlocked Free Shipping"
-                        : `Add ${formatPrice(amountNeededForFreeShipping)} more to unlock FREE Delivery!`}
-                    </span>
-                    <span className="text-[#FF69B4]">{shippingProgressPct}%</span>
-                  </div>
-                  <div className="w-full bg-pink-100 h-2 rounded-full overflow-hidden">
-                    <div
-                      className="bg-gradient-to-r from-[#FFB6C1] to-[#FF69B4] h-full transition-all duration-500"
-                      style={{ width: `${shippingProgressPct}%` }}
-                    />
-                  </div>
-                </div>
 
                 {/* Items List */}
                 {items.map(({ product, quantity }) => {
@@ -299,19 +273,6 @@ export default function CartPage() {
                         <span>−{formatPrice(discountAmount)}</span>
                       </div>
                     )}
-
-                    <div className="flex justify-between items-center">
-                      <span>Packaging & Delivery</span>
-                      {shippingFee === 0 ? (
-                        <span className="text-emerald-600 font-bold uppercase text-[11px]">
-                          FREE
-                        </span>
-                      ) : (
-                        <span className="font-semibold text-gray-800">
-                          {formatPrice(shippingFee)}
-                        </span>
-                      )}
-                    </div>
                   </div>
 
                   <div className="border-t border-pink-100 pt-3 flex justify-between items-baseline">

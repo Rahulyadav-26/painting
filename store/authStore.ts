@@ -48,7 +48,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         return { success: false, error: data.error || "Failed to sign in" };
       }
 
-      set({ user: data.user, isAuthenticated: true });
+      set({ user: data.user, isAuthenticated: true, isLoading: false });
       return { success: true };
     } catch (err) {
       return { success: false, error: "Network error. Please try again." };
@@ -69,7 +69,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         return { success: false, error: data.error || "Failed to create account" };
       }
 
-      set({ user: data.user, isAuthenticated: true });
+      set({ user: data.user, isAuthenticated: true, isLoading: false });
       return { success: true };
     } catch (err) {
       return { success: false, error: "Network error. Please try again." };
@@ -85,7 +85,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (err) {
       console.error("Logout request failed:", err);
     } finally {
-      set({ user: null, isAuthenticated: false });
+      set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
 }));

@@ -81,28 +81,45 @@ What's Inside:
   },
   {
     id: "3",
-    title: "Fairytale Woodland Digital & Printable Sticker Pack",
-    slug: "fairytale-woodland-sticker-pack",
+    title: "Cozy Autumn Digital Sticker Sheet",
+    slug: "cozy-autumn-digital-sticker-sheet",
     artist: "Minted Whimsy Atelier",
     category: "Stickers",
     medium: "Digital Printable / Tablet PDF",
     size: "Digital (A4 / US Letter / Tablet)",
     price: 5,
-    salePrice: 3,
+    salePrice: 1,
     isNew: true,
-    inStock: false,
-    isComingSoon: true,
+    inStock: true,
+    isComingSoon: false,
     images: [
-      "/images/products/woodland-stickers-mockup.jpg",
+      "/images/products/cozy-autumn-stickers-sheet.jpg",
     ],
-    description: `Fairytale Woodland Digital & Printable Sticker Pack
-An enchanting collection of hand-painted watercolor stickers featuring cozy bunnies, floral tea cups, magic mushrooms, starry crescents, and heartfelt phrases.
+    description: `Cozy Autumn Digital Sticker Sheet
 
-What's Inside:
-• 45+ Individual transparent pre-cropped PNG digital stickers for GoodNotes and digital journals
-• Ready-to-print full sticker sheet (PDF + PNG) with die-cut outlines for Cricut or scissors
-• Instant download with unlimited personal usage!`,
-    tags: ["stickers", "digital stickers", "goodnotes stickers", "woodland", "cute bunnies", "watercolor"],
+Bring the warmth and charm of the season straight to your digital planner, journal, or notes app with this hand-illustrated Cozy Autumn Sticker Pack! 
+
+Product Features
+Format: High-resolution digital PNG files. 
+
+Compatibility
+Compatible with GoodNotes, Notability, Samsung Notes, iPad, and all digital planning apps.
+
+Instant Access: Download immediately after purchase and start decorating right away!
+
+Pack of 2 Sheet WATERMARK FREE
+
+Note: This is a digital product. No physical items will be shipped.`,
+    tags: [
+      "stickers",
+      "digital stickers",
+      "autumn stickers",
+      "fall aesthetic",
+      "cozy autumn",
+      "goodnotes",
+      "notability",
+      "planner stickers",
+    ],
     rating: 5.0,
     reviewCount: 64,
   },

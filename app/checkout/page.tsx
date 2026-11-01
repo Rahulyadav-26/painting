@@ -33,6 +33,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useToastStore } from "@/store/toastStore";
 import { formatPrice } from "@/lib/utils";
 import { loadRazorpayScript } from "@/lib/loadRazorpay";
+import { convertUsdToInr } from "@/lib/pricing";
 import UpiQrPaymentModal from "@/components/checkout/UpiQrPaymentModal";
 
 type PaymentMethod = "upi_qr" | "razorpay" | "cod";
@@ -41,7 +42,6 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [quickLoginLoading, setQuickLoginLoading] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState("");
   const [paymentTransactionId, setPaymentTransactionId] = useState("");
@@ -83,16 +83,6 @@ export default function CheckoutPage() {
     }
   }, [user]);
 
-  const handleQuickDemoLogin = async () => {
-    setQuickLoginLoading(true);
-    const res = await login("collector@mintedwhimsy.com", "ArtPass123!");
-    setQuickLoginLoading(false);
-    if (res.success) {
-      addToast("Signed in as Demo Collector! 🎨", "success");
-    } else {
-      addToast(res.error || "Failed to sign in demo collector", "error");
-    }
-  };
 
   if (!mounted || authLoading) {
     return (
@@ -108,9 +98,8 @@ export default function CheckoutPage() {
   }
 
   const subtotal = totalPrice();
-  const qualifiesForFreeShipping = subtotal >= 5000;
-  const shippingFee = subtotal === 0 || qualifiesForFreeShipping ? 0 : 350;
-  const grandTotal = subtotal + shippingFee;
+  const shippingFee = 0;
+  const grandTotal = subtotal;
 
   // 1. Unauthenticated Gateway State: User MUST login/signup before buying
   if (!isAuthenticated || !user) {
@@ -165,33 +154,6 @@ export default function CheckoutPage() {
                   </Link>
                 </div>
 
-                {/* Quick 1-click test button */}
-                <div className="p-4 rounded-2xl bg-[#FFF8F5] border border-pink-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold text-gray-700 uppercase tracking-wider">
-                      Quick Evaluation Mode
-                    </span>
-                    <span className="text-[10px] bg-pink-100 text-[#FF7096] px-2 py-0.5 rounded-full font-bold">
-                      One-Click
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-gray-500 mb-3">
-                    Instantly sign in as seeded collector (<code>collector@mintedwhimsy.com</code>) to
-                    test checkout immediately.
-                  </p>
-                  <button
-                    onClick={handleQuickDemoLogin}
-                    disabled={quickLoginLoading}
-                    className="w-full py-2.5 px-4 rounded-xl bg-gray-900 text-white font-medium text-xs hover:bg-black transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {quickLoginLoading ? (
-                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Sparkles size={13} className="text-pink-300" />
-                    )}
-                    <span>Continue with One-Click Demo Account</span>
-                  </button>
-                </div>
 
                 {/* Guarantees */}
                 <div className="space-y-2.5 pt-4 border-t border-pink-100 text-xs text-gray-600">
@@ -257,17 +219,11 @@ export default function CheckoutPage() {
 
                     <div className="border-t border-pink-100 pt-3 space-y-1.5 text-xs text-gray-600">
                       <div className="flex justify-between">
-                        <span>Subtotal</span>
+                        <span>Product Subtotal</span>
                         <span className="font-semibold text-gray-800">{formatPrice(subtotal)}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Insured Delivery</span>
-                        <span className="text-emerald-600 font-semibold">
-                          {shippingFee === 0 ? "FREE" : formatPrice(shippingFee)}
-                        </span>
-                      </div>
                       <div className="flex justify-between pt-2 border-t border-pink-100 text-sm font-bold text-gray-900">
-                        <span>Grand Total</span>
+                        <span>Total Payable</span>
                         <span className="text-[#D6657E] text-lg font-black">
                           {formatPrice(grandTotal)}
                         </span>
@@ -852,7 +808,7 @@ export default function CheckoutPage() {
                         </span>
                       </div>
                       <p className="text-gray-500 text-[11px] mt-1 leading-relaxed">
-                        Instant Dynamic QR code generated with the <strong>exact order amount ({formatPrice(grandTotal)})</strong> and live 5-minute countdown timer. Scan using <strong>Google Pay, PhonePe, Paytm, or BHIM</strong>.
+                        Instant Dynamic QR code generated with the <strong>exact order amount ({formatPrice(grandTotal)} ≈ ₹{convertUsdToInr(grandTotal)})</strong> and live 5-minute countdown timer. Scan using <strong>Google Pay, PhonePe, Paytm, or BHIM</strong>.
                       </p>
 
                       <div className="flex items-center gap-2 mt-2.5 flex-wrap">
@@ -973,18 +929,8 @@ export default function CheckoutPage() {
                 {/* Cost breakdown */}
                 <div className="border-t border-pink-100 pt-3 flex flex-col gap-2 text-xs text-gray-600">
                   <div className="flex justify-between">
-                    <span>Artworks Subtotal</span>
+                    <span>Product Subtotal</span>
                     <span className="font-semibold text-gray-800">{formatPrice(subtotal)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Insured Art Packaging & Shipping</span>
-                    {shippingFee === 0 ? (
-                      <span className="text-emerald-600 font-bold uppercase text-[11px]">
-                        FREE
-                      </span>
-                    ) : (
-                      <span className="font-semibold text-gray-800">{formatPrice(shippingFee)}</span>
-                    )}
                   </div>
                   <div className="flex justify-between pt-2 border-t border-pink-100 text-sm">
                     <span className="font-bold text-gray-900">Total Payable</span>
@@ -1008,7 +954,7 @@ export default function CheckoutPage() {
                   ) : paymentMethod === "upi_qr" ? (
                     <>
                       <QrCode size={16} />
-                      Generate Dynamic UPI QR • {formatPrice(grandTotal)}
+                      Generate Dynamic UPI QR • {formatPrice(grandTotal)} (₹{convertUsdToInr(grandTotal)})
                     </>
                   ) : paymentMethod === "razorpay" ? (
                     <>

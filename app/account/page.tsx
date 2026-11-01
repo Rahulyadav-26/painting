@@ -87,7 +87,7 @@ export default function AccountPage() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/login");
+    window.location.href = "/login";
   };
 
   const handleVerifyAction = async (orderId: string, action: "approve" | "reject") => {
@@ -209,7 +209,7 @@ export default function AccountPage() {
                   {displayName}
                 </h1>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#FF7096] bg-pink-50 px-2.5 py-0.5 rounded-full border border-pink-100">
-                  {isCuratorAdmin ? "Curator Admin" : "Patron Member"}
+                  Member
                 </span>
               </div>
               <p className="text-xs text-gray-500 mt-1">

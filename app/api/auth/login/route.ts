@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server";
 import { findUserByEmail } from "@/lib/userService";
 import { comparePassword, signToken, COOKIE_NAME, SEVEN_DAYS_IN_SECONDS } from "@/lib/auth";
-import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { checkRateLimit, resetRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
   try {
-    // Rate Limiting (Fix for SEC-05): Max 5 failed/login requests per minute per IP
     const clientIp = getClientIp(request);
-    const rateCheck = checkRateLimit(`login:${clientIp}`, 5, 60 * 1000);
+    const isLocalhost =
+      clientIp === "127.0.0.1" ||
+      clientIp === "::1" ||
+      clientIp.includes("127.0.0.1") ||
+      clientIp === "localhost";
+    const maxAttempts =
+      process.env.NODE_ENV !== "production" || isLocalhost ? 100 : 15;
+
+    const rateCheck = checkRateLimit(`login:${clientIp}`, maxAttempts, 60 * 1000);
     if (!rateCheck.success) {
       return NextResponse.json(
         { error: `Too many login attempts. Please wait ${rateCheck.resetInSeconds} seconds before retrying.` },
@@ -49,6 +56,9 @@ export async function POST(request: Request) {
       );
     }
 
+    // Reset rate limit on successful authentication
+    resetRateLimit(`login:${clientIp}`);
+
     const token = signToken({
       userId: user.id,
       email: user.email,
@@ -69,11 +79,14 @@ export async function POST(request: Request) {
       },
     });
 
+    const isHttps = request.url.startsWith("https://") || request.headers.get("x-forwarded-proto") === "https";
+    const isSecure = !isLocalhost && (process.env.NODE_ENV === "production" || isHttps);
+
     response.cookies.set({
       name: COOKIE_NAME,
       value: token,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isSecure,
       sameSite: "lax",
       path: "/",
       maxAge: SEVEN_DAYS_IN_SECONDS,

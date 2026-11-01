@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { User, Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, AlertCircle, CheckCircle } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, AlertCircle, CheckCircle, UserCheck, LogOut } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { useAuthStore } from "@/store/authStore";
 
@@ -12,7 +12,7 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || "/account";
 
-  const { register, isAuthenticated, checkAuth } = useAuthStore();
+  const { register, user, logout, isAuthenticated, checkAuth } = useAuthStore();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -21,16 +21,17 @@ function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace(redirectUrl);
-    }
-  }, [isAuthenticated, router, redirectUrl]);
+  const handleSwitchAccount = async () => {
+    setLoggingOut(true);
+    await logout();
+    setLoggingOut(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +57,7 @@ function RegisterForm() {
     setLoading(false);
 
     if (result.success) {
-      router.push(redirectUrl);
+      window.location.href = redirectUrl;
     } else {
       setError(result.error || "Unable to register account. Please try again.");
     }
@@ -71,7 +72,7 @@ function RegisterForm() {
           <div className="absolute -top-12 -left-12 w-36 h-36 bg-pink-100 rounded-full blur-2xl opacity-60 pointer-events-none" />
 
           {/* Header */}
-          <div className="text-center mb-8 relative">
+          <div className="text-center mb-6 relative">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#FF7096] to-[#FFA0B4] text-white shadow-md mb-4 text-2xl">
               ✨
             </div>
@@ -84,6 +85,50 @@ function RegisterForm() {
             <p className="text-xs text-gray-500 mt-2">
               Create an account to track artwork shipments, access digital high-res files & enjoy patron perks
             </p>
+          </div>
+
+          {/* Active Session Notice if already logged in */}
+          {isAuthenticated && user && (
+            <div className="mb-6 p-4 rounded-2xl bg-pink-50 border border-pink-200 text-xs">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <UserCheck size={18} className="text-[#FF7096] shrink-0" />
+                  <div>
+                    <p className="font-bold text-gray-900">
+                      Already logged in as {user.name || "Patron"}
+                    </p>
+                    <p className="text-gray-500 text-[11px] font-mono">
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSwitchAccount}
+                  disabled={loggingOut}
+                  className="text-[11px] text-red-500 hover:text-red-700 font-semibold flex items-center gap-1 shrink-0"
+                >
+                  <LogOut size={12} />
+                  <span>{loggingOut ? "Signing out..." : "Sign Out"}</span>
+                </button>
+              </div>
+              <p className="text-[11px] text-gray-500 mt-2">
+                To create a new account for another user, fill out the form below or sign out first.
+              </p>
+            </div>
+          )}
+
+          {/* Tab Switcher: Sign In vs Create Account */}
+          <div className="flex bg-[#FFF0F4] p-1 rounded-2xl mb-6 border border-pink-100">
+            <Link
+              href={`/login${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`}
+              className="flex-1 py-2 text-center text-xs font-bold text-gray-600 hover:text-[#FF7096] transition-colors"
+            >
+              Sign In
+            </Link>
+            <span className="flex-1 py-2 text-center text-xs font-bold text-white bg-[#FF7096] rounded-xl shadow-xs cursor-default">
+              Create Account
+            </span>
           </div>
 
           {/* Checkout Banner */}
@@ -117,7 +162,7 @@ function RegisterForm() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Deepesh Sharma"
+                  placeholder="Enter your full name"
                   required
                   className="w-full pl-10 pr-4 py-3 text-xs bg-[#FFF8F9] border border-pink-100 rounded-2xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF7096] transition-all text-gray-800 placeholder-gray-400"
                 />
@@ -137,7 +182,7 @@ function RegisterForm() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="deepesh@example.com"
+                  placeholder="you@example.com"
                   required
                   className="w-full pl-10 pr-4 py-3 text-xs bg-[#FFF8F9] border border-pink-100 rounded-2xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF7096] transition-all text-gray-800 placeholder-gray-400"
                 />

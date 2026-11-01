@@ -71,6 +71,10 @@ export function checkRateLimit(
   };
 }
 
+export function resetRateLimit(key: string): void {
+  rateLimitStore.delete(key);
+}
+
 export function getClientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) {
@@ -78,3 +82,4 @@ export function getClientIp(request: Request): string {
   }
   return request.headers.get("x-real-ip") || "127.0.0.1";
 }
+

@@ -127,24 +127,33 @@ export async function createUser(data: {
  * Revokes all active sessions for a user by incrementing their tokenVersion (Fix for SEC-04)
  */
 export async function revokeUserSessions(userId: string): Promise<number> {
-  const users = ensureUsersFile();
-  const user = users.find((u) => u.id === userId);
-  if (!user) return 1;
-
-  user.tokenVersion = (user.tokenVersion || 1) + 1;
-  user.updatedAt = new Date();
-  saveUsersToFile(users);
+  let newVersion = 1;
 
   if (isDbConfigured && prisma) {
     try {
-      await (prisma.user as any).update({
+      const updated = await prisma.user.update({
         where: { id: userId },
-        data: { updatedAt: new Date() },
+        data: {
+          tokenVersion: { increment: 1 },
+          updatedAt: new Date(),
+        },
       });
+      newVersion = updated.tokenVersion;
     } catch (err) {
       console.warn("Prisma session revocation warning:", err);
     }
   }
 
-  return user.tokenVersion;
+  const users = ensureUsersFile();
+  const user = users.find((u) => u.id === userId);
+  if (user) {
+    user.tokenVersion = (user.tokenVersion || 1) + 1;
+    user.updatedAt = new Date();
+    saveUsersToFile(users);
+    if (!isDbConfigured || !prisma) {
+      newVersion = user.tokenVersion;
+    }
+  }
+
+  return newVersion;
 }

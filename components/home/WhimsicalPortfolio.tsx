@@ -17,10 +17,10 @@ export default function WhimsicalPortfolio() {
       href: "/product/autumn-harvest-digital-daily-planner",
     },
     {
-      title: "Fairytale Castle in the Clouds",
-      category: "Concept Illustration",
-      image: "/images/theme/glimpse-castle.jpg",
-      href: "/shop",
+      title: "Cozy Autumn Digital Sticker Pack",
+      category: "Digital GoodNotes Stickers",
+      image: "/images/products/cozy-autumn-stickers-sheet.jpg",
+      href: "/product/cozy-autumn-digital-sticker-sheet",
     },
     {
       title: "iPad & Tablet Daily Routine",

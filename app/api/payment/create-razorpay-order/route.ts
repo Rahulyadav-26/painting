@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { createGatewayOrder } from "@/lib/razorpay";
-import { calculateVerifiedOrderPricing } from "@/lib/pricing";
+import { calculateVerifiedOrderPricing, convertUsdToInr } from "@/lib/pricing";
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,7 +31,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Order items are required to calculate payment amount." }, { status: 400 });
     }
 
-    const amountInPaise = Math.round(verifiedAmount * 100);
+    const inrAmount = convertUsdToInr(verifiedAmount);
+    const amountInPaise = Math.round(inrAmount * 100);
     const receiptId = receipt || `rcpt_${Date.now()}`;
 
     const gatewayOrder = await createGatewayOrder({

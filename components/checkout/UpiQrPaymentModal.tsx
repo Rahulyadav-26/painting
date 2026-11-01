@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { validateUpiUtr } from "@/lib/utrValidator";
+import { convertUsdToInr, USD_TO_INR_RATE } from "@/lib/pricing";
 
 interface UpiQrPaymentModalProps {
   isOpen: boolean;
@@ -53,10 +54,13 @@ export default function UpiQrPaymentModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [verifying, setVerifying] = useState<boolean>(false);
 
+  // Convert USD order amount to INR (Rs)
+  const inrAmount = convertUsdToInr(amount);
+
   // Generate NPCI Standard UPI URI
   const upiUri = `upi://pay?pa=${MERCHANT_UPI}&pn=${encodeURIComponent(
     MERCHANT_NAME
-  )}&am=${amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(
+  )}&am=${inrAmount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(
     `Artwork Order ${orderRef}`
   )}&tr=${orderRef}`;
 
@@ -85,7 +89,7 @@ export default function UpiQrPaymentModal({
       setUtrNumber("");
       setErrorMsg(null);
     }
-  }, [isOpen, amount, orderRef]);
+  }, [isOpen, inrAmount, orderRef]);
 
   // Countdown timer
   useEffect(() => {
@@ -180,11 +184,16 @@ export default function UpiQrPaymentModal({
           <div className="bg-[#FFF8F5] rounded-2xl p-4 border border-pink-100 mb-5 flex items-center justify-between">
             <div>
               <span className="text-[11px] text-gray-500 font-medium block">
-                Exact Order Amount
+                Amount in UPI QR (Rs)
               </span>
-              <span className="text-2xl font-black text-[#D6657E]">
-                {formatPrice(amount)}
-              </span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-black text-[#D6657E]">
+                  ₹{inrAmount.toFixed(2)}
+                </span>
+                <span className="text-xs text-gray-500 font-medium">
+                  (${amount} USD @ ₹{USD_TO_INR_RATE}/$)
+                </span>
+              </div>
             </div>
 
             {/* Countdown Timer */}
@@ -257,7 +266,7 @@ export default function UpiQrPaymentModal({
                     {/* Centered Brand Badge */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="w-10 h-10 rounded-full bg-white shadow-md border-2 border-pink-200 flex items-center justify-center text-base font-bold text-[#FF7096]">
-                        $
+                        ₹
                       </div>
                     </div>
                   </div>
@@ -269,8 +278,11 @@ export default function UpiQrPaymentModal({
 
                 {/* Beneficiary Details */}
                 <div className="mt-2 text-center">
-                  <span className="text-[11px] text-gray-600 font-medium">
+                  <span className="text-[11px] text-gray-600 font-medium block">
                     Payee: <strong>{MERCHANT_NAME}</strong>
+                  </span>
+                  <span className="text-[10px] text-emerald-600 font-semibold block mt-0.5">
+                    ✓ Scanning prompts exact order amount in Rs: ₹{inrAmount.toFixed(2)} ($1 = ₹{USD_TO_INR_RATE})
                   </span>
                 </div>
 
@@ -333,7 +345,7 @@ export default function UpiQrPaymentModal({
               className="w-full py-2.5 px-4 rounded-xl bg-[#FFF5F7] border border-pink-200 text-[#FF7096] hover:bg-pink-100 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors sm:hidden"
             >
               <Smartphone size={14} />
-              <span>Tap to Pay via Installed UPI App</span>
+              <span>Tap to Pay ₹{inrAmount.toFixed(2)} via Installed UPI App</span>
             </a>
           </div>
 
