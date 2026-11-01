@@ -75,7 +75,13 @@ export default function ProductCard({ product, index = 0, onQuickView }: Product
             ) : (
               <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-white/95 backdrop-blur-md text-[#2B2329] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm z-10 uppercase tracking-wider border border-[#FFD6E5]">
                 <Sparkles size={10} className="text-[#FF7096]" />
-                <span>{product.category === "Daily Planner" ? "Digital Planner" : "Original 1 of 1"}</span>
+                <span>
+                  {product.category === "Daily Planner"
+                    ? "Digital Planner"
+                    : product.category === "Stickers"
+                    ? "Digital Stickers"
+                    : "Original 1 of 1"}
+                </span>
               </div>
             )}
 

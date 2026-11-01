@@ -93,7 +93,7 @@ What's Inside:
     inStock: true,
     isComingSoon: false,
     images: [
-      "/images/products/cozy-autumn-stickers-sheet.jpg",
+      "/images/products/whatsapp-image-2026-11-01-at-8.08.47-pm.jpeg",
     ],
     description: `Cozy Autumn Digital Sticker Sheet
 

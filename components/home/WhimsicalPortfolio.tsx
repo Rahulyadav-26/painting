@@ -19,7 +19,7 @@ export default function WhimsicalPortfolio() {
     {
       title: "Cozy Autumn Digital Sticker Pack",
       category: "Digital GoodNotes Stickers",
-      image: "/images/products/cozy-autumn-stickers-sheet.jpg",
+      image: "/images/products/whatsapp-image-2026-11-01-at-8.08.47-pm.jpeg",
       href: "/product/cozy-autumn-digital-sticker-sheet",
     },
     {

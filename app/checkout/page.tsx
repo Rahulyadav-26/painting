@@ -681,7 +681,7 @@ export default function CheckoutPage() {
                       required
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+91 98765 43210"
+                      placeholder="Enter phone number"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
                     />
                   </div>
