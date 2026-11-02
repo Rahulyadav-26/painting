@@ -39,6 +39,10 @@ export interface OrderRecord {
   verifiedAt?: string;
   verifiedBy?: string;
   verificationNote?: string;
+  digitalDeliveryStatus?: "pending" | "sent" | "failed";
+  digitalDeliveryEmail?: string;
+  digitalDeliveredAt?: string;
+  digitalPdfFiles?: { title: string; filename: string; downloadUrl: string }[];
   createdAt: string;
 }
 
@@ -124,6 +128,37 @@ export async function getAllOrders(): Promise<OrderRecord[]> {
   return orders.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
+}
+
+export async function getOrderById(orderId: string): Promise<OrderRecord | null> {
+  const orders = ensureOrdersFile();
+  return orders.find((o) => o.id === orderId) || null;
+}
+
+export async function updateOrderDigitalDelivery(
+  orderId: string,
+  delivery: {
+    status: "sent" | "failed";
+    email: string;
+    deliveredAt: string;
+    pdfFiles?: { title: string; filename: string; downloadUrl: string }[];
+  }
+): Promise<OrderRecord | null> {
+  const orders = ensureOrdersFile();
+  const orderIndex = orders.findIndex((o) => o.id === orderId);
+  if (orderIndex === -1) return null;
+
+  const target = orders[orderIndex];
+  target.digitalDeliveryStatus = delivery.status;
+  target.digitalDeliveryEmail = delivery.email;
+  target.digitalDeliveredAt = delivery.deliveredAt;
+  if (delivery.pdfFiles) {
+    target.digitalPdfFiles = delivery.pdfFiles;
+  }
+
+  orders[orderIndex] = target;
+  saveOrdersToFile(orders);
+  return target;
 }
 
 export function isUtrAlreadyUsed(utr: string): boolean {

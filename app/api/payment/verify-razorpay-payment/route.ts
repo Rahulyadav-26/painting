@@ -3,6 +3,7 @@ import { getAuthenticatedUser } from "@/lib/auth";
 import { verifyGatewaySignature } from "@/lib/razorpay";
 import { createOrder } from "@/lib/orderService";
 import { calculateVerifiedOrderPricing } from "@/lib/pricing";
+import { deliverOrderDigitalProducts } from "@/lib/emailService";
 
 export async function POST(request: NextRequest) {
   try {
@@ -79,11 +80,20 @@ export async function POST(request: NextRequest) {
       status: "Confirmed",
     });
 
+    // Send product PDF to the authenticated user's login email
+    let deliveryInfo = null;
+    try {
+      deliveryInfo = await deliverOrderDigitalProducts(newOrder.id, user.email);
+    } catch (deliveryErr) {
+      console.error("Digital product email delivery error:", deliveryErr);
+    }
+
     return NextResponse.json({
       success: true,
-      message: "Payment successfully verified and order recorded.",
+      message: "Payment successfully verified. Product PDF sent to your email.",
       order: newOrder,
       paymentId: razorpay_payment_id,
+      delivery: deliveryInfo,
     });
   } catch (error) {
     console.error("Payment verification error:", error);

@@ -23,6 +23,9 @@ import {
   X,
   Hourglass,
   Lock,
+  FileText,
+  Download,
+  Mail,
 } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { useAuthStore } from "@/store/authStore";
@@ -40,6 +43,28 @@ export default function AccountPage() {
   const [adminOrders, setAdminOrders] = useState<any[]>([]);
   const [adminLoading, setAdminLoading] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [sendingEmailOrderId, setSendingEmailOrderId] = useState<string | null>(null);
+
+  const handleResendOrderEmail = async (orderId: string) => {
+    try {
+      setSendingEmailOrderId(orderId);
+      const res = await fetch(`/api/orders/${orderId}/send-email`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to dispatch product email.");
+        return;
+      }
+      alert(`Product PDF dispatched to your login email (${user?.email})! 📬`);
+      fetchUserOrders();
+    } catch (err) {
+      console.error("Resend error:", err);
+      alert("Error sending email. Please try again.");
+    } finally {
+      setSendingEmailOrderId(null);
+    }
+  };
 
   const wishlistCount = useWishlistStore((s) => s.ids.length);
 
@@ -395,9 +420,31 @@ export default function AccountPage() {
                                   Payment reference could not be matched with bank statement.
                                 </p>
                               ) : (
-                                <p className="text-emerald-600 font-medium mt-1 flex items-center gap-1">
-                                  <Check size={12} /> Digital Certificate of Authenticity issued and sent to {order.userEmail || user.email}
-                                </p>
+                                <div>
+                                  <p className="text-emerald-600 font-medium mt-1 flex items-center gap-1">
+                                    <Check size={12} /> Digital Product PDF & Certificate sent to {order.digitalDeliveryEmail || order.userEmail || user.email}
+                                  </p>
+                                  <div className="mt-2 flex items-center gap-2 flex-wrap">
+                                    <a
+                                      href={`/api/orders/${order.id}/download-pdf?productId=${item.productId || ""}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 bg-[#2B2329] hover:bg-gray-800 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg shadow-sm transition-all"
+                                    >
+                                      <Download size={11} className="text-[#FF7096]" />
+                                      Download Product PDF
+                                    </a>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleResendOrderEmail(order.id)}
+                                      disabled={sendingEmailOrderId === order.id}
+                                      className="inline-flex items-center gap-1 bg-white border border-pink-200 hover:bg-pink-50 text-gray-700 text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
+                                    >
+                                      <Mail size={11} className="text-[#FF7096]" />
+                                      {sendingEmailOrderId === order.id ? "Sending..." : "Resend to Email"}
+                                    </button>
+                                  </div>
+                                </div>
                               )}
                             </div>
                             {item.slug && (

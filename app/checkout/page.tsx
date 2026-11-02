@@ -26,6 +26,9 @@ import {
   Clock,
   Smartphone,
   Hourglass,
+  FileText,
+  Download,
+  Mail,
 } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { useCartStore } from "@/store/cartStore";
@@ -54,10 +57,32 @@ export default function CheckoutPage() {
   const [showSandboxModal, setShowSandboxModal] = useState(false);
   const [pendingGatewayOrder, setPendingGatewayOrder] = useState<any>(null);
   const [simulatedSubMethod, setSimulatedSubMethod] = useState<"upi" | "card" | "netbanking">("upi");
+  const [resendingEmail, setResendingEmail] = useState(false);
 
   const { items, totalPrice, clearCart } = useCartStore();
   const { user, isAuthenticated, isLoading: authLoading, checkAuth, login } = useAuthStore();
   const addToast = useToastStore((s) => s.addToast);
+
+  const handleResendProductEmail = async (targetOrderId: string) => {
+    if (!targetOrderId || resendingEmail) return;
+    try {
+      setResendingEmail(true);
+      const res = await fetch(`/api/orders/${targetOrderId}/send-email`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        addToast(data.error || "Failed to dispatch email.", "error");
+        return;
+      }
+      addToast(`Product PDF successfully sent to ${user?.email || "your email"}! 📬`, "success");
+    } catch (err) {
+      console.error("Resend email error:", err);
+      addToast("Failed to send product email. Please try again.", "error");
+    } finally {
+      setResendingEmail(false);
+    }
+  };
 
   // Form states
   const [email, setEmail] = useState("");
@@ -358,13 +383,60 @@ export default function CheckoutPage() {
                     : "Cash on Delivery"}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Archive Delivery:</span>
-                <span className="font-semibold text-emerald-600">
-                  Digital Certificate sent to {user.email}
+              <div className="flex justify-between items-center pt-1 border-t border-pink-100">
+                <span className="text-gray-500">Product PDF Delivery:</span>
+                <span className="font-semibold text-[#FF7096] flex items-center gap-1">
+                  <Mail size={12} /> {user.email}
                 </span>
               </div>
             </div>
+
+            {/* Digital Product Delivery Card */}
+            {paymentMethod === "razorpay" && (
+              <div className="bg-gradient-to-br from-pink-50 via-white to-rose-50 border border-pink-200 rounded-2xl p-5 mb-8 text-left shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#FF7096] text-white flex items-center justify-center shrink-0 shadow-sm shadow-pink-200">
+                    <FileText size={20} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-gray-900 text-sm">
+                        Product PDF Dispatched to Your Email
+                      </h4>
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                        Attached
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                      Your high-resolution, watermark-free digital product has been sent directly to{" "}
+                      <strong className="text-gray-900">{user.email}</strong> as an email attachment with your Certificate of Authenticity.
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-2 mt-3.5">
+                      <a
+                        href={`/api/orders/${orderId}/download-pdf`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 bg-[#2B2329] text-white hover:bg-gray-800 text-xs font-semibold px-4 py-2 rounded-xl shadow-sm transition-all"
+                      >
+                        <Download size={13} className="text-[#FF7096]" />
+                        <span>Download Product PDF Now</span>
+                      </a>
+
+                      <button
+                        type="button"
+                        onClick={() => handleResendProductEmail(orderId)}
+                        disabled={resendingEmail}
+                        className="inline-flex items-center gap-1.5 bg-white border border-pink-300 text-gray-700 hover:bg-pink-50 text-xs font-semibold px-3.5 py-2 rounded-xl transition-all disabled:opacity-50"
+                      >
+                        <Mail size={13} className="text-[#FF7096]" />
+                        <span>{resendingEmail ? "Sending..." : "Resend to My Email"}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/account" className="btn-pill btn-primary text-xs px-7 py-3">
@@ -396,13 +468,13 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items,
           shippingAddress: {
-            fullName,
-            phone,
-            address,
-            apartment,
-            city,
-            state,
-            pincode,
+            fullName: fullName || user?.name || "Valued Collector",
+            phone: phone || "N/A",
+            address: address || "Instant Digital Download",
+            apartment: apartment || "",
+            city: city || "Digital",
+            state: state || "Digital",
+            pincode: pincode || "000000",
           },
           paymentMethod: `Dynamic UPI QR (${details.upiId})`,
           utrNumber: details.utrNumber,
@@ -445,13 +517,13 @@ export default function CheckoutPage() {
           ...verificationPayload,
           items,
           shippingAddress: {
-            fullName,
-            phone,
-            address,
-            apartment,
-            city,
-            state,
-            pincode,
+            fullName: fullName || user?.name || "Valued Collector",
+            phone: phone || "N/A",
+            address: address || "Instant Digital Download",
+            apartment: apartment || "",
+            city: city || "Digital",
+            state: state || "Digital",
+            pincode: pincode || "000000",
           },
           subtotal,
           shippingFee,
@@ -484,8 +556,9 @@ export default function CheckoutPage() {
   // 5. Checkout Submit Handler
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !phone || !address || !pincode) {
-      addToast("Please fill in all required shipping fields.", "warning");
+
+    if (!fullName || !fullName.trim()) {
+      addToast("Please enter your Collector Name for certificate personalization.", "warning");
       return;
     }
 
@@ -507,13 +580,13 @@ export default function CheckoutPage() {
           body: JSON.stringify({
             items,
             shippingAddress: {
-              fullName,
-              phone,
-              address,
-              apartment,
-              city,
-              state,
-              pincode,
+              fullName: fullName || user?.name || "Valued Collector",
+              phone: phone || "N/A",
+              address: address || "Instant Digital Download",
+              apartment: apartment || "",
+              city: city || "Digital",
+              state: state || "Digital",
+              pincode: pincode || "000000",
             },
             paymentMethod: "Cash on Delivery (COD)",
             subtotal,
@@ -655,6 +728,23 @@ export default function CheckoutPage() {
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div className="sm:col-span-2">
+                    <label className="block text-gray-600 font-medium mb-1">
+                      Collector Name (for Certificate & Delivery) *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="e.g. Rahul Verma"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096] font-medium"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-1">
+                      This name will be inscribed on your official Certificate of Authenticity
+                    </p>
+                  </div>
+
                   <div>
                     <label className="block text-gray-600 font-medium mb-1">
                       Account Email (Verified) *
@@ -674,109 +764,28 @@ export default function CheckoutPage() {
 
                   <div>
                     <label className="block text-gray-600 font-medium mb-1">
-                      Phone Number (Delivery SMS) *
+                      Phone Number (Optional)
                     </label>
                     <input
                       type="tel"
-                      required
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Enter phone number"
+                      placeholder="e.g. 9876543210"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
                     />
+                    <p className="text-[10px] text-gray-400 mt-1">
+                      Optional contact for order notifications
+                    </p>
                   </div>
                 </div>
               </div>
 
-              {/* Step 2: Shipping Address */}
-              <div className="bg-white p-6 rounded-3xl border border-pink-100 shadow-sm">
-                <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-[#FF7096] text-white flex items-center justify-center text-xs">
-                    2
-                  </span>
-                  Art Delivery Address
-                </h2>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div className="sm:col-span-2">
-                    <label className="block text-gray-600 font-medium mb-1">Collector Full Name *</label>
-                    <input
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="e.g. Priya Sharma"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-gray-600 font-medium mb-1">Street Address / House No. *</label>
-                    <input
-                      type="text"
-                      required
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder="Flat, Studio, or Street"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-gray-600 font-medium mb-1">Locality / Landmark</label>
-                    <input
-                      type="text"
-                      value={apartment}
-                      onChange={(e) => setApartment(e.target.value)}
-                      placeholder="e.g. Near City Center / Area name"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-gray-600 font-medium mb-1">City *</label>
-                    <input
-                      type="text"
-                      required
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      placeholder="e.g. Mumbai"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-gray-600 font-medium mb-1">State *</label>
-                    <input
-                      type="text"
-                      required
-                      value={state}
-                      onChange={(e) => setState(e.target.value)}
-                      placeholder="e.g. Maharashtra"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-gray-600 font-medium mb-1">Pincode *</label>
-                    <input
-                      type="text"
-                      required
-                      value={pincode}
-                      onChange={(e) => setPincode(e.target.value)}
-                      placeholder="e.g. 400001"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Step 3: Payment Gateway Selection */}
+              {/* Step 2: Payment Gateway Selection */}
               <div className="bg-white p-6 rounded-3xl border border-pink-100 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-[#FF7096] text-white flex items-center justify-center text-xs">
-                      3
+                      2
                     </span>
                     Payment Selection
                   </h2>

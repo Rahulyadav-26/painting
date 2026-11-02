@@ -41,9 +41,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Order must contain at least one artwork item." }, { status: 400 });
     }
 
-    if (!shippingAddress || !shippingAddress.fullName || !shippingAddress.phone || !shippingAddress.address) {
-      return NextResponse.json({ error: "Incomplete shipping address information." }, { status: 400 });
-    }
+    const effectiveAddress = {
+      fullName: (shippingAddress?.fullName || user.name || "Valued Collector").trim(),
+      phone: (shippingAddress?.phone || "").trim() || "N/A",
+      address: (shippingAddress?.address || "").trim() || "Digital Delivery (Instant Download)",
+      apartment: (shippingAddress?.apartment || "").trim(),
+      city: (shippingAddress?.city || "").trim() || "Digital",
+      state: (shippingAddress?.state || "").trim() || "Digital",
+      pincode: (shippingAddress?.pincode || "").trim() || "000000",
+    };
 
     // Security Fix (SEC-01): Payment method validation & strict authentication
     const rawMethod = String(paymentMethod || "").trim();
@@ -95,20 +101,12 @@ export async function POST(request: NextRequest) {
     const newOrder = await createOrder({
       userId: user.id,
       userEmail: user.email,
-      userName: user.name || shippingAddress.fullName,
+      userName: user.name || effectiveAddress.fullName,
       items: verifiedPricing.items,
       subtotal: verifiedPricing.subtotal,
       shippingFee: verifiedPricing.shippingFee,
       totalPrice: verifiedPricing.totalPrice,
-      shippingAddress: {
-        fullName: shippingAddress.fullName.trim(),
-        phone: shippingAddress.phone.trim(),
-        address: shippingAddress.address.trim(),
-        apartment: shippingAddress.apartment?.trim() || "",
-        city: shippingAddress.city?.trim() || "",
-        state: shippingAddress.state?.trim() || "",
-        pincode: shippingAddress.pincode?.trim() || "",
-      },
+      shippingAddress: effectiveAddress,
       paymentMethod: isUpiPayment ? rawMethod : "Cash on Delivery (COD)",
       paymentStatus: "Pending Verification",
       status: isUpiPayment ? "Payment Verification Pending" : "Confirmed",

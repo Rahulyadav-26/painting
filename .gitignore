@@ -43,3 +43,7 @@ next-env.d.ts
 # local persistent database stores (PII & orders)
 /data/
 data/*.json
+
+# generated order digital product downloads
+/public/downloads/
+

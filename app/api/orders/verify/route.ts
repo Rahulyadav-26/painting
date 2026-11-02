@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth";
 import { updateOrderPaymentVerification, getAllOrders } from "@/lib/orderService";
+import { deliverOrderDigitalProducts } from "@/lib/emailService";
 
 const ADMIN_VERIFICATION_PIN = process.env.ADMIN_VERIFICATION_PIN || "992639";
 
@@ -75,13 +76,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Order not found." }, { status: 404 });
     }
 
+    let deliveryInfo = null;
+    if (action === "approve") {
+      try {
+        deliveryInfo = await deliverOrderDigitalProducts(updated.id, updated.userEmail);
+      } catch (deliveryErr) {
+        console.error("Digital product email delivery error upon admin approval:", deliveryErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message:
         action === "approve"
-          ? "Payment verified by authorized admin. Certificate of Authenticity and order confirmed."
+          ? "Payment verified by authorized admin. Product PDF sent to collector email."
           : "Payment rejected. Order cancelled.",
       order: updated,
+      delivery: deliveryInfo,
     });
   } catch (error) {
     console.error("POST /api/orders/verify error:", error);
