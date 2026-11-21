@@ -114,7 +114,7 @@ export default function Navbar() {
                 Home
               </Link>
               <Link
-                href="#about"
+                href="/about"
                 className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full text-[#5C4047] hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors"
               >
                 About

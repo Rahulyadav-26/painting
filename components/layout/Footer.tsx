@@ -41,7 +41,7 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-xs text-[#6E4E56]">
               <li>
-                <Link href="/#about" className="hover:text-[#E05D78] transition-colors">
+                <Link href="/about" className="hover:text-[#E05D78] transition-colors">
                   About Minted Whimsy
                 </Link>
               </li>

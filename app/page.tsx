@@ -3,7 +3,6 @@
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import WhimsicalHero from "@/components/home/WhimsicalHero";
-import WhimsicalAbout from "@/components/home/WhimsicalAbout";
 import WhimsicalProducts from "@/components/home/WhimsicalProducts";
 import DailyPlannerSection from "@/components/home/DailyPlannerSection";
 import WhimsicalProcess from "@/components/home/WhimsicalProcess";
@@ -21,10 +20,7 @@ export default function HomePage() {
       {/* 1. Whimsical Hero: "Whimsical art for dreamers & kind hearts" */}
       <WhimsicalHero />
 
-      {/* 2. About Atelier: "Artist. Storyteller. Daydreamer." */}
-      <WhimsicalAbout />
-
-      {/* 3. Our Products: Planner, Notes, Stickers, Coloring pages */}
+      {/* 2. Our Products: Planner, Notes, Stickers, Coloring pages */}
       <WhimsicalProducts />
 
       {/* 4. Autumn Harvest Digital Daily Planner Spotlight & Mockup Showcase */}

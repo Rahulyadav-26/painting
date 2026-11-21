@@ -1,17 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import PageLoader from "@/components/ui/PageLoader";
 
 export default function PageLoadingOverlay() {
   const pathname = usePathname();
-  // Always active on initial page mount or reload
-  const [loading, setLoading] = useState(true);
+  // Disabled by default on initial mount and reload so pages load instantly
+  const [loading, setLoading] = useState(false);
   const [key, setKey] = useState(0);
 
-  const isInitialMount = useRef(true);
   const isPreview = pathname === "/loading-preview";
 
   const handleComplete = useCallback(() => {
@@ -19,55 +18,7 @@ export default function PageLoadingOverlay() {
     setLoading(false);
   }, []);
 
-  // 1. Listen for route changes (navigation between pages)
-  useEffect(() => {
-    if (isPreview) {
-      setLoading(false);
-      return;
-    }
-
-    // Skip incrementing on initial mount because initial state already loads it
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-
-    setLoading(true);
-    setKey((prev) => prev + 1);
-  }, [pathname, isPreview]);
-
-  // 2. Intercept internal link clicks for immediate responsive feedback
-  useEffect(() => {
-    if (isPreview) return;
-
-    const handleAnchorClick = (e: MouseEvent) => {
-      const target = (e.target as HTMLElement).closest("a");
-      if (!target) return;
-
-      const href = target.getAttribute("href");
-      if (!href) return;
-
-      const isInternal =
-        href.startsWith("/") &&
-        !href.startsWith("//") &&
-        !href.startsWith("/loading-preview") &&
-        target.target !== "_blank";
-
-      const isSamePageHash = href.startsWith("#") || href.startsWith(pathname + "#");
-
-      if (isInternal && !isSamePageHash && href !== pathname) {
-        setLoading(true);
-        setKey((prev) => prev + 1);
-      }
-    };
-
-    document.addEventListener("click", handleAnchorClick, { capture: true });
-    return () => {
-      document.removeEventListener("click", handleAnchorClick, { capture: true });
-    };
-  }, [pathname, isPreview]);
-
-  // 3. Listen for manual trigger events from buttons or scripts
+  // Listen for manual trigger events (e.g. from the preview button in footer)
   useEffect(() => {
     const handleManualTrigger = () => {
       setLoading(true);

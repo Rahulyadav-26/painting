@@ -160,6 +160,7 @@ export default function WhimsicalContact() {
                 src="/images/theme/whimsy-contact.jpg"
                 alt="Minted Whimsy artist writing letters at her wooden art desk"
                 fill
+                sizes="(max-width: 640px) 176px, 208px"
                 className="object-cover"
               />
             </div>

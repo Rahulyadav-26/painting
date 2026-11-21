@@ -79,6 +79,7 @@ export default function WhimsicalHero() {
                   src="/images/theme/whimsy-hero.jpg"
                   alt="Minted Whimsy - Whimsical Illustration Atelier"
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 520px"
                   className="object-cover transition-transform duration-700 group-hover:scale-103"
                   priority
                 />

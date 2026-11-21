@@ -124,6 +124,7 @@ export default function DailyPlannerSection() {
                 src={images[selectedImageIndex].src}
                 alt={images[selectedImageIndex].label}
                 fill
+                sizes="(max-width: 1024px) 100vw, 600px"
                 className="object-cover transition-transform duration-500 group-hover:scale-102"
                 priority
               />
@@ -160,7 +161,7 @@ export default function DailyPlannerSection() {
                   }`}
                 >
                   <div className="relative w-12 h-14 rounded-lg overflow-hidden shrink-0 border border-gray-200">
-                    <Image src={img.src} alt={img.label} fill className="object-cover" />
+                    <Image src={img.src} alt={img.label} fill sizes="48px" className="object-cover" />
                   </div>
                   <div className="overflow-hidden">
                     <p className="text-xs font-bold text-[#3E2718] truncate">{img.label}</p>
