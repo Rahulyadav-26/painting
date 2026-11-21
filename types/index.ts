@@ -46,6 +46,7 @@ export interface Product {
   size: ProductSize;
   price: number;
   salePrice?: number;
+  currency?: "INR" | "USD";
   isNew: boolean;
   inStock: boolean;
   isComingSoon?: boolean;

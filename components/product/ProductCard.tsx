@@ -162,15 +162,15 @@ export default function ProductCard({ product, index = 0, onQuickView }: Product
                 {product.salePrice ? (
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs text-gray-400 line-through">
-                      {formatPrice(product.price)}
+                      {formatPrice(product.price, product.currency)}
                     </span>
                     <span className="text-sm sm:text-base font-bold text-[#2B2B2B]">
-                      {formatPrice(product.salePrice)}
+                      {formatPrice(product.salePrice, product.currency)}
                     </span>
                   </div>
                 ) : (
                   <span className="text-sm sm:text-base font-bold text-[#2B2B2B]">
-                    {formatPrice(product.price)}
+                    {formatPrice(product.price, product.currency)}
                   </span>
                 )}
               </div>

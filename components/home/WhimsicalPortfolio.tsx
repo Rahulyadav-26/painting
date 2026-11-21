@@ -17,9 +17,9 @@ export default function WhimsicalPortfolio() {
       href: "/product/autumn-harvest-digital-daily-planner",
     },
     {
-      title: "Cozy Autumn Digital Sticker Pack",
+      title: "Festive Holiday Whimsical Sticker Pack",
       category: "Digital GoodNotes Stickers",
-      image: "/images/products/whatsapp-image-2026-11-01-at-8.08.47-pm.jpeg",
+      image: "/images/products/festive-christmas-stickers.jpg",
       href: "/product/cozy-autumn-digital-sticker-sheet",
     },
     {

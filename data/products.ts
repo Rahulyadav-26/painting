@@ -81,41 +81,40 @@ What's Inside:
   },
   {
     id: "3",
-    title: "Cozy Autumn Digital Sticker Sheet",
+    title: "Whimsical Festive Holiday Sticker Pack",
     slug: "cozy-autumn-digital-sticker-sheet",
     artist: "Minted Whimsy Atelier",
     category: "Stickers",
     medium: "Digital Printable / Tablet PDF",
     size: "Digital (A4 / US Letter / Tablet)",
-    price: 5,
-    salePrice: 1,
+    price: 150,
+    salePrice: 30,
+    currency: "INR",
     isNew: true,
     inStock: true,
     isComingSoon: false,
     images: [
-      "/images/products/whatsapp-image-2026-11-01-at-8.08.47-pm.jpeg",
+      "/images/products/festive-christmas-stickers.jpg",
+      "/images/products/festive-christmas-stickers-mockup-1.jpg",
+      "/images/products/festive-christmas-stickers-mockup-2.jpg",
+      "/images/products/festive-christmas-stickers-mockup-3.jpg",
+      "/images/products/festive-christmas-stickers-mockup-4.jpg",
+      "/images/products/festive-christmas-stickers-mockup-5.jpg",
     ],
-    description: `Cozy Autumn Digital Sticker Sheet
+    description: `Authentic Art: Originally painted by hand with love and attention to detail—no stock graphics or AI.
 
-Bring the warmth and charm of the season straight to your digital planner, journal, or notes app with this hand-illustrated Cozy Autumn Sticker Pack! 
+Built to Last: Printed on premium, thick vinyl that resists water, fading, and scratches.
 
-Product Features
-Format: High-resolution digital PNG files. 
+Versatile Use: Ideal for sealing Christmas cards, personalizing gift tags, or decorating laptops, tumblers, and planners.
 
-Compatibility
-Compatible with GoodNotes, Notability, Samsung Notes, iPad, and all digital planning apps.
-
-Instant Access: Download immediately after purchase and start decorating right away!
-
-Pack of 2 Sheet WATERMARK FREE
-
-Note: This is a digital product. No physical items will be shipped.`,
+Great Stocking Stuffer: Lightweight, affordable, and festive for art lovers of all ages.`,
     tags: [
       "stickers",
       "digital stickers",
-      "autumn stickers",
-      "fall aesthetic",
-      "cozy autumn",
+      "holiday stickers",
+      "christmas stickers",
+      "vinyl stickers",
+      "festive stickers",
       "goodnotes",
       "notability",
       "planner stickers",

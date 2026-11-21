@@ -92,15 +92,15 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
               {product.salePrice ? (
                 <>
                   <span className="text-xl font-black text-[#FF7096]">
-                    {formatPrice(product.salePrice)}
+                    {formatPrice(product.salePrice, product.currency)}
                   </span>
                   <span className="text-xs text-gray-400 line-through">
-                    {formatPrice(product.price)}
+                    {formatPrice(product.price, product.currency)}
                   </span>
                 </>
               ) : (
                 <span className="text-xl font-black text-gray-900">
-                  {formatPrice(product.price)}
+                  {formatPrice(product.price, product.currency)}
                 </span>
               )}
             </div>

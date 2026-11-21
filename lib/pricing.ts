@@ -12,6 +12,7 @@ export interface VerifiedOrderPricing {
   subtotal: number;
   shippingFee: number;
   totalPrice: number;
+  totalInr: number;
 }
 
 /**
@@ -21,12 +22,16 @@ export interface VerifiedOrderPricing {
  * are strictly determined from the authorized catalog on the server.
  * Completely ignores any untrusted client-supplied prices.
  */
-export function calculateVerifiedOrderPricing(rawItems: any[]): VerifiedOrderPricing {
+export function calculateVerifiedOrderPricing(
+  rawItems: any[],
+  paymentMethod?: string
+): VerifiedOrderPricing {
   if (!Array.isArray(rawItems) || rawItems.length === 0) {
     throw new Error("Order must contain at least one artwork item.");
   }
 
   let subtotal = 0;
+  let totalInr = 0;
   const items: OrderItem[] = rawItems.map((rawItem) => {
     const pId = String(rawItem.product?.id || rawItem.productId || "").trim();
     const pSlug = String(rawItem.product?.slug || rawItem.slug || "").trim();
@@ -37,10 +42,12 @@ export function calculateVerifiedOrderPricing(rawItems: any[]): VerifiedOrderPri
       throw new Error(`Artwork not found in catalog (ID: ${pId || pSlug || "unknown"})`);
     }
 
-    const isDigital = product.category === "Daily Planner" || product.medium?.includes("Digital");
     const verifiedUnitPrice = product.salePrice ?? product.price;
     const qty = Math.max(1, Math.min(10, Math.floor(Number(rawItem.quantity) || 1)));
     subtotal += verifiedUnitPrice * qty;
+
+    const unitInr = product.currency === "INR" ? verifiedUnitPrice : convertUsdToInr(verifiedUnitPrice);
+    totalInr += unitInr * qty;
 
     return {
       productId: product.id,
@@ -53,18 +60,20 @@ export function calculateVerifiedOrderPricing(rawItems: any[]): VerifiedOrderPri
     };
   });
 
-  const allDigital = items.every((item) => {
-    const product = products.find((p) => p.id === item.productId);
-    return product?.category === "Daily Planner" || product?.medium?.includes("Digital");
-  });
+  const isCod = paymentMethod ? (
+    paymentMethod.toLowerCase().includes("cod") || 
+    paymentMethod.toLowerCase().includes("cash on delivery")
+  ) : false;
 
-  const shippingFee = 0;
-  const totalPrice = subtotal;
+  const shippingFee = isCod ? (totalInr >= 500 ? 0 : 80) : 0;
+  const totalPrice = subtotal + shippingFee;
+  totalInr += shippingFee;
 
   return {
     items,
     subtotal,
     shippingFee,
     totalPrice,
+    totalInr,
   };
 }

@@ -29,6 +29,7 @@ import {
   FileText,
   Download,
   Mail,
+  MapPin,
 } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { useCartStore } from "@/store/cartStore";
@@ -123,8 +124,17 @@ export default function CheckoutPage() {
   }
 
   const subtotal = totalPrice();
-  const shippingFee = 0;
-  const grandTotal = subtotal;
+  const inrSubtotal = items.reduce((sum, item) => {
+    const unitPrice = item.product.salePrice ?? item.product.price;
+    const unitInr = item.product.currency === "INR" ? unitPrice : convertUsdToInr(unitPrice);
+    return sum + unitInr * item.quantity;
+  }, 0);
+
+  // COD shipping calculation: ₹80 standard courier delivery on orders below ₹500, FREE on ₹500+
+  const isCod = paymentMethod === "cod";
+  const shippingFee = isCod ? (inrSubtotal >= 500 ? 0 : 80) : 0;
+  const inrGrandTotal = inrSubtotal + shippingFee;
+  const grandTotal = subtotal + shippingFee;
 
   // 1. Unauthenticated Gateway State: User MUST login/signup before buying
   if (!isAuthenticated || !user) {
@@ -236,7 +246,7 @@ export default function CheckoutPage() {
                             </p>
                           </div>
                           <span className="text-xs font-bold text-gray-800">
-                            {formatPrice((product.salePrice ?? product.price) * quantity)}
+                            {formatPrice((product.salePrice ?? product.price) * quantity, product.currency)}
                           </span>
                         </div>
                       ))}
@@ -570,8 +580,29 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Method B: Cash on Delivery
+    // Method B: Cash on Delivery (COD)
     if (paymentMethod === "cod") {
+      if (!phone.trim() || phone.trim().length < 10) {
+        addToast("Please enter a valid 10-digit mobile number for courier delivery.", "warning");
+        return;
+      }
+      if (!address.trim()) {
+        addToast("Please enter your delivery street address / house number.", "warning");
+        return;
+      }
+      if (!city.trim()) {
+        addToast("Please enter your city.", "warning");
+        return;
+      }
+      if (!state.trim()) {
+        addToast("Please enter your state.", "warning");
+        return;
+      }
+      if (!pincode.trim() || pincode.trim().length !== 6) {
+        addToast("Please enter a valid 6-digit postal PIN code.", "warning");
+        return;
+      }
+
       setLoading(true);
       try {
         const res = await fetch("/api/orders", {
@@ -580,18 +611,18 @@ export default function CheckoutPage() {
           body: JSON.stringify({
             items,
             shippingAddress: {
-              fullName: fullName || user?.name || "Valued Collector",
-              phone: phone || "N/A",
-              address: address || "Instant Digital Download",
-              apartment: apartment || "",
-              city: city || "Digital",
-              state: state || "Digital",
-              pincode: pincode || "000000",
+              fullName: fullName.trim() || user?.name || "Valued Collector",
+              phone: phone.trim(),
+              address: address.trim(),
+              apartment: apartment.trim(),
+              city: city.trim(),
+              state: state.trim(),
+              pincode: pincode.trim(),
             },
             paymentMethod: "Cash on Delivery (COD)",
-            subtotal,
+            subtotal: inrSubtotal,
             shippingFee,
-            totalPrice: grandTotal,
+            totalPrice: inrGrandTotal,
           }),
         });
 
@@ -607,7 +638,7 @@ export default function CheckoutPage() {
         clearCart();
         setLoading(false);
         setOrderComplete(true);
-        addToast("COD Order confirmed! 🎨", "success");
+        addToast("COD Order confirmed for courier delivery! 🎨", "success");
       } catch (err) {
         console.error("COD submit error:", err);
         addToast("Network error. Please try again.", "error");
@@ -718,19 +749,26 @@ export default function CheckoutPage() {
           <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left Column: Checkout Form (7 cols) */}
             <div className="lg:col-span-7 flex flex-col gap-6">
-              {/* Step 1: Contact Information */}
-              <div className="bg-white p-6 rounded-3xl border border-pink-100 shadow-sm">
-                <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-[#FF7096] text-white flex items-center justify-center text-xs">
-                    1
-                  </span>
-                  Collector Contact Information
-                </h2>
+              {/* Step 1: Contact Information & Delivery Address */}
+              <div className="bg-white p-6 rounded-3xl border border-pink-100 shadow-sm space-y-5">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-[#FF7096] text-white flex items-center justify-center text-xs">
+                      1
+                    </span>
+                    Collector &amp; Delivery Information
+                  </h2>
+                  {paymentMethod === "cod" && (
+                    <span className="text-[10px] bg-amber-50 text-amber-800 font-bold px-2.5 py-0.5 rounded-full border border-amber-200">
+                      Physical Courier Delivery
+                    </span>
+                  )}
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div className="sm:col-span-2">
-                    <label className="block text-gray-600 font-medium mb-1">
-                      Collector Name (for Certificate & Delivery) *
+                  <div>
+                    <label className="block text-gray-700 font-semibold mb-1">
+                      Full Name *
                     </label>
                     <input
                       type="text"
@@ -741,12 +779,12 @@ export default function CheckoutPage() {
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096] font-medium"
                     />
                     <p className="text-[10px] text-gray-400 mt-1">
-                      This name will be inscribed on your official Certificate of Authenticity
+                      Inscribed on your Certificate of Authenticity &amp; parcel label
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-gray-600 font-medium mb-1">
+                    <label className="block text-gray-700 font-semibold mb-1">
                       Account Email (Verified) *
                     </label>
                     <input
@@ -758,25 +796,115 @@ export default function CheckoutPage() {
                       title="Bound to your authenticated patron account"
                     />
                     <p className="text-[10px] text-gray-400 mt-1">
-                      Digital authenticity certificates will be delivered here
+                      Order confirmations and tracking updates sent here
                     </p>
                   </div>
 
-                  <div>
-                    <label className="block text-gray-600 font-medium mb-1">
-                      Phone Number (Optional)
+                  <div className="sm:col-span-2">
+                    <label className="block text-gray-700 font-semibold mb-1">
+                      Mobile Number {paymentMethod === "cod" ? "(Required for Courier Delivery) *" : "(Optional)"}
                     </label>
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="e.g. 9876543210"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
-                    />
+                    <div className="relative flex items-center">
+                      <span className="absolute left-3.5 text-gray-500 font-semibold text-xs">
+                        +91
+                      </span>
+                      <input
+                        type="tel"
+                        required={paymentMethod === "cod"}
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, "").slice(0, 10))}
+                        placeholder="9876543210"
+                        className="w-full pl-12 pr-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
+                      />
+                    </div>
                     <p className="text-[10px] text-gray-400 mt-1">
-                      Optional contact for order notifications
+                      {paymentMethod === "cod"
+                        ? "Delivery courier will call or SMS this number prior to arrival"
+                        : "Optional contact for order notifications"}
                     </p>
                   </div>
+
+                  {/* Delivery Address Fields for COD */}
+                  {paymentMethod === "cod" && (
+                    <>
+                      <div className="sm:col-span-2 pt-2 border-t border-pink-100">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#D6657E] uppercase tracking-wider mb-2">
+                          <MapPin size={13} />
+                          <span>Courier Delivery Address</span>
+                        </div>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-gray-700 font-semibold mb-1">
+                          Street Address / House / Flat No. *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          placeholder="e.g. Flat 402, Lotus Residency, 12th Main Road, Indiranagar"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-gray-700 font-semibold mb-1">
+                          Apartment, Suite, Landmark (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={apartment}
+                          onChange={(e) => setApartment(e.target.value)}
+                          placeholder="e.g. Near Metro Station / Opposite BDA Complex"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-gray-700 font-semibold mb-1">
+                          City / Town *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                          placeholder="e.g. Bengaluru"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-gray-700 font-semibold mb-1">
+                          State *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={state}
+                          onChange={(e) => setState(e.target.value)}
+                          placeholder="e.g. Karnataka"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096]"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2 sm:w-1/2 sm:pr-2">
+                        <label className="block text-gray-700 font-semibold mb-1">
+                          Postal PIN Code *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          maxLength={6}
+                          value={pincode}
+                          onChange={(e) => setPincode(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
+                          placeholder="e.g. 560038"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF8F5] border border-pink-100 focus:outline-none focus:ring-2 focus:ring-[#FF7096] font-mono tracking-wider"
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -821,7 +949,7 @@ export default function CheckoutPage() {
                         </span>
                       </div>
                       <p className="text-gray-500 text-[11px] mt-1 leading-relaxed">
-                        Instant Dynamic QR code generated with the <strong>exact order amount ({formatPrice(grandTotal)} ≈ ₹{convertUsdToInr(grandTotal)})</strong> and live 5-minute countdown timer. Scan using <strong>Google Pay, PhonePe, Paytm, or BHIM</strong>.
+                        Instant Dynamic QR code generated with the <strong>exact order amount ({formatPrice(grandTotal)} ≈ ₹{inrGrandTotal.toFixed(2)})</strong> and live 5-minute countdown timer. Scan using <strong>Google Pay, PhonePe, Paytm, or BHIM</strong>.
                       </p>
 
                       <div className="flex items-center gap-2 mt-2.5 flex-wrap">
@@ -888,12 +1016,17 @@ export default function CheckoutPage() {
                       className="accent-[#FF7096] mt-0.5"
                     />
                     <div className="flex-1">
-                      <span className="font-bold text-gray-900 text-sm flex items-center gap-1.5">
-                        <Banknote size={14} className="text-gray-600" />
-                        Cash on Delivery (COD)
-                      </span>
-                      <p className="text-gray-500 text-[11px] mt-1">
-                        Inspect the original painting upon physical courier delivery before making payment.
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-gray-900 text-sm flex items-center gap-1.5">
+                          <Banknote size={15} className="text-[#FF7096]" />
+                          Cash on Delivery (COD)
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                          {inrSubtotal >= 500 ? "FREE Delivery" : "+₹80 Shipping"}
+                        </span>
+                      </div>
+                      <p className="text-gray-500 text-[11px] mt-1 leading-relaxed">
+                        Pay in cash upon physical courier delivery at your doorstep. Standard shipping charge of ₹80 applies on orders below ₹500. <strong>Orders above ₹500 get FREE Shipping!</strong>
                       </p>
                     </div>
                   </label>
@@ -933,22 +1066,60 @@ export default function CheckoutPage() {
                         </p>
                       </div>
                       <span className="text-xs font-bold text-gray-800">
-                        {formatPrice((product.salePrice ?? product.price) * quantity)}
+                        {formatPrice((product.salePrice ?? product.price) * quantity, product.currency)}
                       </span>
                     </div>
                   ))}
                 </div>
 
                 {/* Cost breakdown */}
-                <div className="border-t border-pink-100 pt-3 flex flex-col gap-2 text-xs text-gray-600">
-                  <div className="flex justify-between">
+                <div className="border-t border-pink-100 pt-3 flex flex-col gap-2.5 text-xs text-gray-600">
+                  <div className="flex justify-between items-center">
                     <span>Product Subtotal</span>
-                    <span className="font-semibold text-gray-800">{formatPrice(subtotal)}</span>
+                    <span className="font-semibold text-gray-800">
+                      ₹{inrSubtotal.toFixed(0)}
+                    </span>
                   </div>
-                  <div className="flex justify-between pt-2 border-t border-pink-100 text-sm">
-                    <span className="font-bold text-gray-900">Total Payable</span>
+
+                  {/* Shipping Fee */}
+                  <div className="flex justify-between items-center">
+                    <span className="flex items-center gap-1.5">
+                      <Truck size={13} className="text-[#FF7096]" />
+                      Shipping Charge {paymentMethod === "cod" ? "(COD Courier)" : ""}
+                    </span>
+                    {paymentMethod === "cod" ? (
+                      shippingFee === 0 ? (
+                        <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-md text-[11px]">
+                          FREE (Order above ₹500)
+                        </span>
+                      ) : (
+                        <span className="font-semibold text-gray-800">
+                          +₹80
+                        </span>
+                      )
+                    ) : (
+                      <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-md text-[11px]">
+                        FREE
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Free shipping progress prompt if COD and subtotal < 500 */}
+                  {paymentMethod === "cod" && inrSubtotal < 500 && (
+                    <div className="p-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 text-[11px] text-amber-900 flex items-center justify-between">
+                      <span>✨ Add <strong>₹{500 - inrSubtotal}</strong> more for <strong>FREE Shipping</strong>!</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between pt-2 border-t border-pink-100 text-sm items-baseline">
+                    <div>
+                      <span className="font-bold text-gray-900 block">Total Payable</span>
+                      <span className="text-[10px] text-gray-400">
+                        {paymentMethod === "cod" ? "Pay in cash at delivery" : "All taxes & fees included"}
+                      </span>
+                    </div>
                     <span className="text-xl font-black text-[#D6657E]">
-                      {formatPrice(grandTotal)}
+                      ₹{inrGrandTotal.toFixed(0)}
                     </span>
                   </div>
                 </div>
@@ -967,17 +1138,17 @@ export default function CheckoutPage() {
                   ) : paymentMethod === "upi_qr" ? (
                     <>
                       <QrCode size={16} />
-                      Generate Dynamic UPI QR • {formatPrice(grandTotal)} (₹{convertUsdToInr(grandTotal)})
+                      Generate Dynamic UPI QR • ₹{inrGrandTotal.toFixed(2)}
                     </>
                   ) : paymentMethod === "razorpay" ? (
                     <>
                       <Zap size={16} />
-                      Pay with Razorpay • {formatPrice(grandTotal)}
+                      Pay with Razorpay • ₹{inrGrandTotal.toFixed(2)}
                     </>
                   ) : (
                     <>
                       <Sparkles size={16} />
-                      Complete COD Order • {formatPrice(grandTotal)}
+                      Complete COD Order • ₹{inrGrandTotal.toFixed(0)}
                     </>
                   )}
                 </button>
@@ -1004,6 +1175,7 @@ export default function CheckoutPage() {
         <UpiQrPaymentModal
           isOpen={showUpiQrModal}
           amount={grandTotal}
+          inrAmount={inrGrandTotal}
           orderRef={generatedOrderRef}
           customerName={fullName}
           customerEmail={email}

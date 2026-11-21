@@ -22,6 +22,7 @@ import { convertUsdToInr, USD_TO_INR_RATE } from "@/lib/pricing";
 interface UpiQrPaymentModalProps {
   isOpen: boolean;
   amount: number;
+  inrAmount?: number;
   orderRef: string;
   customerName: string;
   customerEmail: string;
@@ -41,6 +42,7 @@ const MERCHANT_NAME =
 export default function UpiQrPaymentModal({
   isOpen,
   amount,
+  inrAmount: propInrAmount,
   orderRef,
   customerName,
   customerEmail,
@@ -54,8 +56,8 @@ export default function UpiQrPaymentModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [verifying, setVerifying] = useState<boolean>(false);
 
-  // Convert USD order amount to INR (Rs)
-  const inrAmount = convertUsdToInr(amount);
+  // Convert USD order amount to INR (Rs) or use explicit inrAmount if provided
+  const inrAmount = propInrAmount !== undefined && propInrAmount > 0 ? propInrAmount : convertUsdToInr(amount);
 
   // Generate NPCI Standard UPI URI
   const upiUri = `upi://pay?pa=${MERCHANT_UPI}&pn=${encodeURIComponent(

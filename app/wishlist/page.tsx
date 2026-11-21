@@ -109,7 +109,7 @@ export default function WishlistPage() {
                       </p>
 
                       <div className="mt-auto pt-2 flex items-center justify-between">
-                        <span className="font-bold text-sm text-gray-900">{formatPrice(price)}</span>
+                        <span className="font-bold text-sm text-gray-900">{formatPrice(price, product.currency)}</span>
 
                         <button
                           onClick={() => {

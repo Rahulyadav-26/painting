@@ -261,18 +261,18 @@ export default function ProductDetailPage({ params }: PageProps) {
                 {product.salePrice ? (
                   <>
                     <span className="text-3xl font-extrabold text-[#D6657E]">
-                      {formatPrice(product.salePrice)}
+                      {formatPrice(product.salePrice, product.currency)}
                     </span>
                     <span className="text-base text-gray-400 line-through">
-                      {formatPrice(product.price)}
+                      {formatPrice(product.price, product.currency)}
                     </span>
                     <span className="text-xs font-bold text-[#3FA66B] bg-emerald-50 px-2 py-0.5 rounded-full">
-                      Save {formatPrice(product.price - product.salePrice)}
+                      Save {formatPrice(product.price - product.salePrice, product.currency)}
                     </span>
                   </>
                 ) : (
                   <span className="text-3xl font-extrabold text-gray-900">
-                    {formatPrice(product.price)}
+                    {formatPrice(product.price, product.currency)}
                   </span>
                 )}
                 <span className="text-xs text-gray-500 ml-auto">Taxes & Packaging included</span>

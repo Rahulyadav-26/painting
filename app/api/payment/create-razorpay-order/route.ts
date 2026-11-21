@@ -15,10 +15,12 @@ export async function POST(request: NextRequest) {
 
     // Security Fix (SEC-02): Determine payment amount strictly server-side
     let verifiedAmount = 0;
+    let verifiedInr = 0;
     if (items && Array.isArray(items) && items.length > 0) {
       try {
         const verifiedPricing = calculateVerifiedOrderPricing(items);
         verifiedAmount = verifiedPricing.totalPrice;
+        verifiedInr = verifiedPricing.totalInr;
         if (typeof amount === "number" && Math.abs(amount - verifiedAmount) > 0.01) {
           return NextResponse.json({ error: "Price tampering detected. Payment amount does not match authorized catalog price." }, { status: 400 });
         }
@@ -31,7 +33,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Order items are required to calculate payment amount." }, { status: 400 });
     }
 
-    const inrAmount = convertUsdToInr(verifiedAmount);
+    const inrAmount = verifiedInr > 0 ? verifiedInr : convertUsdToInr(verifiedAmount);
     const amountInPaise = Math.round(inrAmount * 100);
     const receiptId = receipt || `rcpt_${Date.now()}`;
 

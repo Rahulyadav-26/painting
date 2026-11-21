@@ -65,6 +65,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (isCodPayment) {
+      if (!shippingAddress?.address || !shippingAddress?.city || !shippingAddress?.state || !shippingAddress?.pincode || !shippingAddress?.phone) {
+        return NextResponse.json(
+          { error: "Complete delivery address (street, city, state, pincode) and phone number are required for Cash on Delivery (COD) courier delivery." },
+          { status: 400 }
+        );
+      }
+    }
+
     let verifiedUtr: string | undefined = undefined;
 
     if (isUpiPayment) {
@@ -93,7 +102,7 @@ export async function POST(request: NextRequest) {
     // Security Fix (SEC-02): Calculate and verify item pricing server-side
     let verifiedPricing;
     try {
-      verifiedPricing = calculateVerifiedOrderPricing(items);
+      verifiedPricing = calculateVerifiedOrderPricing(items, rawMethod);
     } catch (err: any) {
       return NextResponse.json({ error: err.message || "Invalid artwork items in order." }, { status: 400 });
     }

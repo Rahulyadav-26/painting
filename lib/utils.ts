@@ -1,11 +1,11 @@
 /**
- * Format a price in USD with the $ symbol.
+ * Format a price in USD ($) or INR (₹).
  */
-export const formatPrice = (amount: number): string =>
-  new Intl.NumberFormat("en-US", {
+export const formatPrice = (amount: number, currency: string = "USD"): string =>
+  new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en-US", {
     style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 2,
+    currency: currency,
+    maximumFractionDigits: currency === "INR" ? 0 : 2,
     minimumFractionDigits: 0,
   }).format(amount);
 

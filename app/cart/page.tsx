@@ -160,7 +160,7 @@ export default function CartPage() {
                           by {product.artist} • {product.size}
                         </p>
                         <p className="text-xs font-semibold text-gray-800 mt-1">
-                          {formatPrice(unitPrice)}
+                          {formatPrice(unitPrice, product.currency)}
                         </p>
                       </div>
 
@@ -186,7 +186,7 @@ export default function CartPage() {
                       {/* Item Total Price */}
                       <div className="text-right sm:w-28">
                         <span className="font-bold text-sm sm:text-base text-gray-900">
-                          {formatPrice(unitPrice * quantity)}
+                          {formatPrice(unitPrice * quantity, product.currency)}
                         </span>
                       </div>
 
