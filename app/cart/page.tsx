@@ -57,8 +57,8 @@ export default function CartPage() {
       setAppliedDiscount({ code: "WHIMSY10", percent: 10 });
       addToast("Coupon 'WHIMSY10' applied! 10% discount added. ✨", "success");
     } else if (code === "FIRSTART") {
-      setAppliedDiscount({ code: "FIRSTART", flat: 3 });
-      addToast("Coupon 'FIRSTART' applied! $3 discount added. ✨", "success");
+      setAppliedDiscount({ code: "FIRSTART", flat: 270 });
+      addToast("Coupon 'FIRSTART' applied! ₹270 discount added. ✨", "success");
     } else if (code === "ARTLOVE") {
       setAppliedDiscount({ code: "ARTLOVE", percent: 15 });
       addToast("Coupon 'ARTLOVE' applied! 15% discount added. ✨", "success");

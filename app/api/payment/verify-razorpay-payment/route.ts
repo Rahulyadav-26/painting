@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     // Security Fix (SEC-02): Calculate and verify item pricing server-side
     let verifiedPricing;
     try {
-      verifiedPricing = calculateVerifiedOrderPricing(items);
+      verifiedPricing = calculateVerifiedOrderPricing(items, paymentMethod);
     } catch (err: any) {
       return NextResponse.json({ error: err.message || "Invalid artwork items in order." }, { status: 400 });
     }

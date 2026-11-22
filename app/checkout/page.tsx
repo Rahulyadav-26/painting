@@ -40,7 +40,7 @@ import { loadRazorpayScript } from "@/lib/loadRazorpay";
 import { convertUsdToInr } from "@/lib/pricing";
 import UpiQrPaymentModal from "@/components/checkout/UpiQrPaymentModal";
 
-type PaymentMethod = "upi_qr" | "razorpay" | "cod";
+type PaymentMethod = "upi_qr" | "razorpay" | "physical_delivery";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -49,6 +49,7 @@ export default function CheckoutPage() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState("");
   const [paymentTransactionId, setPaymentTransactionId] = useState("");
+  const [physicalPaySubMethod, setPhysicalPaySubMethod] = useState<"upi_qr" | "razorpay">("upi_qr");
 
   // UPI Dynamic QR Modal State
   const [showUpiQrModal, setShowUpiQrModal] = useState(false);
@@ -130,9 +131,9 @@ export default function CheckoutPage() {
     return sum + unitInr * item.quantity;
   }, 0);
 
-  // COD shipping calculation: ₹80 standard courier delivery on orders below ₹500, FREE on ₹500+
-  const isCod = paymentMethod === "cod";
-  const shippingFee = isCod ? (inrSubtotal >= 500 ? 0 : 80) : 0;
+  // Physical delivery shipping calculation: ₹80 standard courier delivery on orders below ₹500, FREE on ₹500+
+  const isPhysical = paymentMethod === "physical_delivery";
+  const shippingFee = isPhysical ? (inrSubtotal >= 500 ? 0 : 80) : 0;
   const inrGrandTotal = inrSubtotal + shippingFee;
   const grandTotal = subtotal + shippingFee;
 
@@ -486,7 +487,9 @@ export default function CheckoutPage() {
             state: state || "Digital",
             pincode: pincode || "000000",
           },
-          paymentMethod: `Dynamic UPI QR (${details.upiId})`,
+          paymentMethod: isPhysical
+            ? `Physical Delivery Option (UPI QR: ${details.upiId})`
+            : `Dynamic UPI QR (${details.upiId})`,
           utrNumber: details.utrNumber,
           subtotal,
           shippingFee,
@@ -538,7 +541,9 @@ export default function CheckoutPage() {
           subtotal,
           shippingFee,
           totalPrice: grandTotal,
-          paymentMethod: `Razorpay (${simulatedSubMethod.toUpperCase()})`,
+          paymentMethod: isPhysical
+            ? `Physical Delivery Option (Razorpay ${simulatedSubMethod.toUpperCase()})`
+            : `Razorpay (${simulatedSubMethod.toUpperCase()})`,
         }),
       });
 
@@ -572,16 +577,8 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Method A: Dynamic UPI QR Code (Primary & Direct)
-    if (paymentMethod === "upi_qr") {
-      const newRef = `MW-${Math.floor(100000 + Math.random() * 900000)}`;
-      setGeneratedOrderRef(newRef);
-      setShowUpiQrModal(true);
-      return;
-    }
-
-    // Method B: Cash on Delivery (COD)
-    if (paymentMethod === "cod") {
+    // Physical delivery address validation
+    if (isPhysical) {
       if (!phone.trim() || phone.trim().length < 10) {
         addToast("Please enter a valid 10-digit mobile number for courier delivery.", "warning");
         return;
@@ -602,52 +599,19 @@ export default function CheckoutPage() {
         addToast("Please enter a valid 6-digit postal PIN code.", "warning");
         return;
       }
+    }
 
-      setLoading(true);
-      try {
-        const res = await fetch("/api/orders", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            items,
-            shippingAddress: {
-              fullName: fullName.trim() || user?.name || "Valued Collector",
-              phone: phone.trim(),
-              address: address.trim(),
-              apartment: apartment.trim(),
-              city: city.trim(),
-              state: state.trim(),
-              pincode: pincode.trim(),
-            },
-            paymentMethod: "Cash on Delivery (COD)",
-            subtotal: inrSubtotal,
-            shippingFee,
-            totalPrice: inrGrandTotal,
-          }),
-        });
+    const effectiveMethod = isPhysical ? physicalPaySubMethod : paymentMethod;
 
-        const data = await res.json();
-
-        if (!res.ok) {
-          addToast(data.error || "Failed to process order.", "error");
-          setLoading(false);
-          return;
-        }
-
-        setOrderId(data.order.id);
-        clearCart();
-        setLoading(false);
-        setOrderComplete(true);
-        addToast("COD Order confirmed for courier delivery! 🎨", "success");
-      } catch (err) {
-        console.error("COD submit error:", err);
-        addToast("Network error. Please try again.", "error");
-        setLoading(false);
-      }
+    // Prepaid Method A: Dynamic UPI QR Code (Primary & Direct)
+    if (effectiveMethod === "upi_qr") {
+      const newRef = `MW-${Math.floor(100000 + Math.random() * 900000)}`;
+      setGeneratedOrderRef(newRef);
+      setShowUpiQrModal(true);
       return;
     }
 
-    // Method C: Razorpay Flow
+    // Prepaid Method B: Razorpay Flow
     setLoading(true);
     try {
       const orderRes = await fetch("/api/payment/create-razorpay-order", {
@@ -657,6 +621,7 @@ export default function CheckoutPage() {
           items,
           amount: grandTotal,
           receipt: `rcpt_${Date.now()}`,
+          paymentMethod: isPhysical ? "Physical Delivery Option (Prepaid via Razorpay)" : "Razorpay (Online Payment)",
         }),
       });
 
@@ -758,9 +723,9 @@ export default function CheckoutPage() {
                     </span>
                     Collector &amp; Delivery Information
                   </h2>
-                  {paymentMethod === "cod" && (
+                  {isPhysical && (
                     <span className="text-[10px] bg-amber-50 text-amber-800 font-bold px-2.5 py-0.5 rounded-full border border-amber-200">
-                      Physical Courier Delivery
+                      Physical Courier Delivery (Prepaid)
                     </span>
                   )}
                 </div>
@@ -802,7 +767,7 @@ export default function CheckoutPage() {
 
                   <div className="sm:col-span-2">
                     <label className="block text-gray-700 font-semibold mb-1">
-                      Mobile Number {paymentMethod === "cod" ? "(Required for Courier Delivery) *" : "(Optional)"}
+                      Mobile Number {isPhysical ? "(Required for Courier Delivery) *" : "(Optional)"}
                     </label>
                     <div className="relative flex items-center">
                       <span className="absolute left-3.5 text-gray-500 font-semibold text-xs">
@@ -810,7 +775,7 @@ export default function CheckoutPage() {
                       </span>
                       <input
                         type="tel"
-                        required={paymentMethod === "cod"}
+                        required={isPhysical}
                         value={phone}
                         onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, "").slice(0, 10))}
                         placeholder="9876543210"
@@ -818,19 +783,19 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <p className="text-[10px] text-gray-400 mt-1">
-                      {paymentMethod === "cod"
-                        ? "Delivery courier will call or SMS this number prior to arrival"
+                      {isPhysical
+                        ? "Courier dispatch updates and tracking notifications sent here"
                         : "Optional contact for order notifications"}
                     </p>
                   </div>
 
-                  {/* Delivery Address Fields for COD */}
-                  {paymentMethod === "cod" && (
+                  {/* Delivery Address Fields for Physical Delivery */}
+                  {isPhysical && (
                     <>
                       <div className="sm:col-span-2 pt-2 border-t border-pink-100">
                         <div className="flex items-center gap-1.5 text-xs font-bold text-[#D6657E] uppercase tracking-wider mb-2">
                           <MapPin size={13} />
-                          <span>Courier Delivery Address</span>
+                          <span>Physical Delivery Address (Courier Dispatch)</span>
                         </div>
                       </div>
 
@@ -1000,10 +965,10 @@ export default function CheckoutPage() {
                     </div>
                   </label>
 
-                  {/* Cash on Delivery */}
+                  {/* Physical Delivery Option */}
                   <label
                     className={`flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${
-                      paymentMethod === "cod"
+                      paymentMethod === "physical_delivery"
                         ? "border-[#FF7096] bg-pink-50/40 ring-2 ring-pink-200"
                         : "border-pink-100 hover:border-pink-200"
                     }`}
@@ -1011,23 +976,84 @@ export default function CheckoutPage() {
                     <input
                       type="radio"
                       name="payment"
-                      checked={paymentMethod === "cod"}
-                      onChange={() => setPaymentMethod("cod")}
+                      checked={paymentMethod === "physical_delivery"}
+                      onChange={() => setPaymentMethod("physical_delivery")}
                       className="accent-[#FF7096] mt-0.5"
                     />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-gray-900 text-sm flex items-center gap-1.5">
-                          <Banknote size={15} className="text-[#FF7096]" />
-                          Cash on Delivery (COD)
+                          <Truck size={15} className="text-[#FF7096]" />
+                          Physical Delivery Option
                         </span>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
                           {inrSubtotal >= 500 ? "FREE Delivery" : "+₹80 Shipping"}
                         </span>
                       </div>
-                      <p className="text-gray-500 text-[11px] mt-1 leading-relaxed">
-                        Pay in cash upon physical courier delivery at your doorstep. Standard shipping charge of ₹80 applies on orders below ₹500. <strong>Orders above ₹500 get FREE Shipping!</strong>
+                      <p className="text-gray-600 text-[11px] mt-1 leading-relaxed">
+                        <strong className="text-[#C23D5B] block mb-0.5 font-bold">
+                          User pay first online — there is no COD (Cash on Delivery) option.
+                        </strong>
+                        Choose this option for physical printed stickers, stationery &amp; art parcels delivered directly to your doorstep. All physical orders are 100% prepaid and will be carefully packaged and dispatched via courier after online payment is confirmed. Standard shipping charge of ₹80 applies on orders below ₹500. <strong>Orders above ₹500 get FREE Shipping!</strong>
                       </p>
+
+                      {/* Sub-selector for prepaid method */}
+                      {paymentMethod === "physical_delivery" && (
+                        <div className="mt-3 pt-3 border-t border-pink-200/60 flex flex-col gap-2">
+                          <span className="text-[11px] font-bold text-gray-800">
+                            Select Prepaid Payment Method (Pay First):
+                          </span>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPhysicalPaySubMethod("upi_qr");
+                              }}
+                              className={`flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition-all ${
+                                physicalPaySubMethod === "upi_qr"
+                                  ? "bg-white border-[#FF7096] ring-1 ring-[#FF7096]"
+                                  : "bg-white/60 border-gray-200 hover:bg-white"
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="phys_pay_method"
+                                checked={physicalPaySubMethod === "upi_qr"}
+                                onChange={() => setPhysicalPaySubMethod("upi_qr")}
+                                className="accent-[#FF7096]"
+                              />
+                              <span className="font-semibold text-xs text-gray-800 flex items-center gap-1">
+                                <QrCode size={13} className="text-[#FF7096]" />
+                                Dynamic UPI QR (GPay / PhonePe)
+                              </span>
+                            </div>
+
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPhysicalPaySubMethod("razorpay");
+                              }}
+                              className={`flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition-all ${
+                                physicalPaySubMethod === "razorpay"
+                                  ? "bg-white border-[#FF7096] ring-1 ring-[#FF7096]"
+                                  : "bg-white/60 border-gray-200 hover:bg-white"
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="phys_pay_method"
+                                checked={physicalPaySubMethod === "razorpay"}
+                                onChange={() => setPhysicalPaySubMethod("razorpay")}
+                                className="accent-[#FF7096]"
+                              />
+                              <span className="font-semibold text-xs text-gray-800 flex items-center gap-1">
+                                <Zap size={13} className="text-[#FF7096]" />
+                                Cards / NetBanking (Razorpay)
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </label>
                 </div>
@@ -1085,9 +1111,9 @@ export default function CheckoutPage() {
                   <div className="flex justify-between items-center">
                     <span className="flex items-center gap-1.5">
                       <Truck size={13} className="text-[#FF7096]" />
-                      Shipping Charge {paymentMethod === "cod" ? "(COD Courier)" : ""}
+                      Shipping Charge {isPhysical ? "(Physical Courier)" : ""}
                     </span>
-                    {paymentMethod === "cod" ? (
+                    {isPhysical ? (
                       shippingFee === 0 ? (
                         <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-md text-[11px]">
                           FREE (Order above ₹500)
@@ -1099,13 +1125,13 @@ export default function CheckoutPage() {
                       )
                     ) : (
                       <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-md text-[11px]">
-                        FREE
+                        FREE (Instant Digital)
                       </span>
                     )}
                   </div>
 
-                  {/* Free shipping progress prompt if COD and subtotal < 500 */}
-                  {paymentMethod === "cod" && inrSubtotal < 500 && (
+                  {/* Free shipping progress prompt if physical delivery and subtotal < 500 */}
+                  {isPhysical && inrSubtotal < 500 && (
                     <div className="p-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 text-[11px] text-amber-900 flex items-center justify-between">
                       <span>✨ Add <strong>₹{500 - inrSubtotal}</strong> more for <strong>FREE Shipping</strong>!</span>
                     </div>
@@ -1115,7 +1141,9 @@ export default function CheckoutPage() {
                     <div>
                       <span className="font-bold text-gray-900 block">Total Payable</span>
                       <span className="text-[10px] text-gray-400">
-                        {paymentMethod === "cod" ? "Pay in cash at delivery" : "All taxes & fees included"}
+                        {isPhysical
+                          ? "Prepaid Order (No COD) • All courier charges included"
+                          : "All taxes & fees included"}
                       </span>
                     </div>
                     <span className="text-xl font-black text-[#D6657E]">
@@ -1124,31 +1152,26 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                {/* Submit button */}
+                {/* Submit button — ALWAYS PREPAID */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn-pill btn-primary w-full py-3.5 text-sm flex items-center justify-center gap-2 mt-2 shadow-lg"
+                  className="btn-pill btn-primary w-full py-3.5 text-sm flex items-center justify-center gap-2 mt-2 shadow-lg cursor-pointer"
                 >
                   {loading ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                       Connecting Payment Gateway...
                     </>
-                  ) : paymentMethod === "upi_qr" ? (
+                  ) : (isPhysical ? physicalPaySubMethod === "upi_qr" : paymentMethod === "upi_qr") ? (
                     <>
                       <QrCode size={16} />
                       Generate Dynamic UPI QR • ₹{inrGrandTotal.toFixed(2)}
                     </>
-                  ) : paymentMethod === "razorpay" ? (
+                  ) : (
                     <>
                       <Zap size={16} />
                       Pay with Razorpay • ₹{inrGrandTotal.toFixed(2)}
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles size={16} />
-                      Complete COD Order • ₹{inrGrandTotal.toFixed(0)}
                     </>
                   )}
                 </button>
@@ -1197,7 +1220,7 @@ export default function CheckoutPage() {
 
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#3395FF] to-[#0D6EFD] text-white flex items-center justify-center font-bold text-lg shadow-md">
-                $
+                ₹
               </div>
               <div>
                 <div className="flex items-center gap-1.5">

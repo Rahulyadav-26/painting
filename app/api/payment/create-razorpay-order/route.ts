@@ -11,14 +11,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { items, amount, receipt } = body;
+    const { items, amount, receipt, paymentMethod } = body;
 
     // Security Fix (SEC-02): Determine payment amount strictly server-side
     let verifiedAmount = 0;
     let verifiedInr = 0;
     if (items && Array.isArray(items) && items.length > 0) {
       try {
-        const verifiedPricing = calculateVerifiedOrderPricing(items);
+        const verifiedPricing = calculateVerifiedOrderPricing(items, paymentMethod);
         verifiedAmount = verifiedPricing.totalPrice;
         verifiedInr = verifiedPricing.totalInr;
         if (typeof amount === "number" && Math.abs(amount - verifiedAmount) > 0.01) {

@@ -441,7 +441,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                     <div className="flex items-center gap-3 text-xs text-gray-700">
                       <Truck size={16} className="text-[#D6657E] shrink-0" />
                       <span>
-                        <strong>Free Shipping</strong> on orders above ₹500 / $35.
+                        <strong>Free Shipping</strong> on orders above ₹500.
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-700">

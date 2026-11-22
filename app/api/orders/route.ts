@@ -54,21 +54,22 @@ export async function POST(request: NextRequest) {
     // Security Fix (SEC-01): Payment method validation & strict authentication
     const rawMethod = String(paymentMethod || "").trim();
     const isUpiPayment = rawMethod.toLowerCase().includes("upi");
-    const isCodPayment = rawMethod.toLowerCase().includes("cod") || rawMethod.toLowerCase().includes("cash on delivery");
+    const isPhysicalPayment = rawMethod.toLowerCase().includes("physical");
 
-    // Only Dynamic UPI QR (with validated UTR) or COD can be placed directly via /api/orders.
-    // Card/online gateway payments MUST go through /api/payment/verify-razorpay-payment.
-    if (!isUpiPayment && !isCodPayment) {
+    // All direct orders require verified prepaid payment (UPI QR with validated UTR).
+    // Online card payments go through /api/payment/verify-razorpay-payment.
+    // There is NO unpaid COD option — user must pay first.
+    if (!isUpiPayment) {
       return NextResponse.json(
-        { error: "Invalid payment method. Online card payments must be authenticated via the secure payment gateway." },
+        { error: "Prepaid payment required. Please pay first online via UPI QR or Cards/NetBanking. There is no Cash on Delivery (COD) option." },
         { status: 400 }
       );
     }
 
-    if (isCodPayment) {
+    if (isPhysicalPayment) {
       if (!shippingAddress?.address || !shippingAddress?.city || !shippingAddress?.state || !shippingAddress?.pincode || !shippingAddress?.phone) {
         return NextResponse.json(
-          { error: "Complete delivery address (street, city, state, pincode) and phone number are required for Cash on Delivery (COD) courier delivery." },
+          { error: "Complete delivery address (street, city, state, pincode) and 10-digit mobile number are required for Physical Delivery." },
           { status: 400 }
         );
       }
@@ -116,10 +117,10 @@ export async function POST(request: NextRequest) {
       shippingFee: verifiedPricing.shippingFee,
       totalPrice: verifiedPricing.totalPrice,
       shippingAddress: effectiveAddress,
-      paymentMethod: isUpiPayment ? rawMethod : "Cash on Delivery (COD)",
+      paymentMethod: rawMethod || "Dynamic UPI QR (Prepaid)",
       paymentStatus: "Pending Verification",
-      status: isUpiPayment ? "Payment Verification Pending" : "Confirmed",
-      utrNumber: isUpiPayment ? verifiedUtr : undefined,
+      status: "Payment Verification Pending",
+      utrNumber: verifiedUtr,
     });
 
     return NextResponse.json({ success: true, order: newOrder }, { status: 201 });

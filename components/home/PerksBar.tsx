@@ -7,7 +7,7 @@ const perks = [
   {
     icon: Truck,
     title: "Free Shipping",
-    description: "Free delivery on orders above $35.",
+    description: "Free delivery on orders above ₹500.",
     color: "#D6657E",
     bg: "#FFE3DC",
   },
@@ -27,8 +27,8 @@ const perks = [
   },
   {
     icon: RefreshCw,
-    title: "Easy Returns",
-    description: "Not in love with your piece? Return within 14 days.",
+    title: "Handmade Care",
+    description: "Crafted and packed with love. No returns.",
     color: "#F5A623",
     bg: "#FFFBEB",
   },

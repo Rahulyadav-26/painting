@@ -1,10 +1,10 @@
 import { products } from "../data/products";
 import type { OrderItem } from "@/lib/orderService";
 
-export const USD_TO_INR_RATE = Number(process.env.NEXT_PUBLIC_USD_TO_INR_RATE) || 85;
+export const USD_TO_INR_RATE = Number(process.env.NEXT_PUBLIC_USD_TO_INR_RATE) || 90;
 
 export const convertUsdToInr = (usdAmount: number, rate = USD_TO_INR_RATE): number => {
-  return Math.round(usdAmount * rate * 100) / 100;
+  return Math.round(usdAmount * rate);
 };
 
 export interface VerifiedOrderPricing {
@@ -60,12 +60,13 @@ export function calculateVerifiedOrderPricing(
     };
   });
 
-  const isCod = paymentMethod ? (
+  const isPhysical = paymentMethod ? (
+    paymentMethod.toLowerCase().includes("physical") ||
     paymentMethod.toLowerCase().includes("cod") || 
     paymentMethod.toLowerCase().includes("cash on delivery")
   ) : false;
 
-  const shippingFee = isCod ? (totalInr >= 500 ? 0 : 80) : 0;
+  const shippingFee = isPhysical ? (totalInr >= 500 ? 0 : 80) : 0;
   const totalPrice = subtotal + shippingFee;
   totalInr += shippingFee;
 

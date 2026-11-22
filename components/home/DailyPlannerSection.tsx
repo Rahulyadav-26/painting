@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { products } from "@/data/products";
+import { formatPrice } from "@/lib/utils";
 
 export default function DailyPlannerSection() {
   const planner = products[0]; // Autumn Harvest Digital Daily Planner
@@ -190,10 +191,12 @@ export default function DailyPlannerSection() {
 
               <div className="flex items-baseline gap-3 my-4">
                 <span className="text-3xl sm:text-4xl font-black text-[#A14B15]">
-                  ${planner.salePrice ?? planner.price}
+                  {formatPrice(planner.salePrice ?? planner.price, planner.currency)}
                 </span>
                 {planner.salePrice && (
-                  <span className="text-base text-gray-400 line-through">${planner.price}</span>
+                  <span className="text-base text-gray-400 line-through">
+                    {formatPrice(planner.price, planner.currency)}
+                  </span>
                 )}
                 <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
                   Special Autumn Launch Offer
@@ -251,7 +254,7 @@ export default function DailyPlannerSection() {
                   className="flex-1 py-4 px-6 rounded-2xl bg-[#984A1A] hover:bg-[#833B12] text-white font-bold text-sm shadow-lg shadow-orange-950/15 transition-all flex items-center justify-center gap-2 group cursor-pointer"
                 >
                   <ShoppingBag size={18} className="group-hover:scale-110 transition-transform" />
-                  {added ? "Added to Cart! 🎨" : "Add to Cart • $" + (planner.salePrice ?? planner.price)}
+                  {added ? "Added to Cart! 🎨" : "Add to Cart • " + formatPrice(planner.salePrice ?? planner.price, planner.currency)}
                 </button>
 
                 <Link

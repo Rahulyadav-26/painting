@@ -193,7 +193,7 @@ export default function UpiQrPaymentModal({
                   ₹{inrAmount.toFixed(2)}
                 </span>
                 <span className="text-xs text-gray-500 font-medium">
-                  (${amount} USD @ ₹{USD_TO_INR_RATE}/$)
+                  INR
                 </span>
               </div>
             </div>
@@ -284,7 +284,7 @@ export default function UpiQrPaymentModal({
                     Payee: <strong>{MERCHANT_NAME}</strong>
                   </span>
                   <span className="text-[10px] text-emerald-600 font-semibold block mt-0.5">
-                    ✓ Scanning prompts exact order amount in Rs: ₹{inrAmount.toFixed(2)} ($1 = ₹{USD_TO_INR_RATE})
+                    ✓ Scanning prompts exact order amount: ₹{inrAmount.toFixed(2)}
                   </span>
                 </div>
 

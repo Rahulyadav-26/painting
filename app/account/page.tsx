@@ -679,7 +679,7 @@ export default function AccountPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <ShieldCheck size={16} className="text-emerald-500 shrink-0" />
-                  <span>Complimentary insured shipping on all orders over $35</span>
+                  <span>Complimentary insured shipping on all orders over ₹500</span>
                 </li>
               </ul>
             </div>
