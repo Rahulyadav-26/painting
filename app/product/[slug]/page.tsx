@@ -278,6 +278,11 @@ export default function ProductDetailPage({ params }: PageProps) {
                 <span className="text-xs text-gray-500 ml-auto">Taxes & Packaging included</span>
               </div>
 
+              {/* No returns policy tag */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-[#C23D5B] text-xs font-semibold self-start">
+                <span>No returns</span>
+              </div>
+
               {/* Artwork Attributes Pills */}
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="bg-white p-3 rounded-xl border border-pink-50">
@@ -425,9 +430,9 @@ export default function ProductDetailPage({ params }: PageProps) {
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-700">
-                      <RotateCcw size={16} className="text-[#4A90D9] shrink-0" />
+                      <RotateCcw size={16} className="text-[#E05D78] shrink-0" />
                       <span>
-                        <strong>Tablet & Print Ready</strong>: Perfect for GoodNotes, Notability, or home printout.
+                        <strong>Return Policy</strong>: No returns.
                       </span>
                     </div>
                   </>
@@ -436,19 +441,19 @@ export default function ProductDetailPage({ params }: PageProps) {
                     <div className="flex items-center gap-3 text-xs text-gray-700">
                       <Truck size={16} className="text-[#D6657E] shrink-0" />
                       <span>
-                        <strong>Free Shipping</strong> on orders above $35.
+                        <strong>Free Shipping</strong> on orders above ₹500 / $35.
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-700">
                       <ShieldCheck size={16} className="text-[#3FA66B] shrink-0" />
                       <span>
-                        <strong>Signed Certificate of Authenticity</strong> included.
+                        <strong>Authentic Handmade Art</strong> with love.
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-700">
-                      <RotateCcw size={16} className="text-[#4A90D9] shrink-0" />
+                      <RotateCcw size={16} className="text-[#E05D78] shrink-0" />
                       <span>
-                        <strong>14-Day Return Guarantee</strong> with full collector refund.
+                        <strong>Return Policy</strong>: No returns.
                       </span>
                     </div>
                   </>

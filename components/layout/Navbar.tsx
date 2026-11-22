@@ -106,115 +106,80 @@ export default function Navbar() {
             </Link>
 
             {/* Center Nav — matching screenshot */}
-            <nav className="hidden lg:flex items-center gap-1">
+            <nav className="hidden lg:flex items-center gap-6">
               <Link
                 href="/"
-                className="text-[11px] font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full text-[#E05D78] bg-[#FCE5EB]"
+                className="text-sm font-semibold text-[#1E1B1D] hover:text-[#E05D78] transition-colors"
               >
                 Home
               </Link>
               <Link
-                href="/about"
-                className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full text-[#5C4047] hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                href="/#products"
-                className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full text-[#5C4047] hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors"
-              >
-                Products
-              </Link>
-              <Link
-                href="/shop?category=Daily%20Planner"
-                className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full text-[#9A4E1B] bg-[#FFF0E2] border border-[#F0D5C0] hover:bg-[#FFE5D0] transition-colors flex items-center gap-1"
-              >
-                <span>Daily Planner</span>
-                <span className="text-[8px] bg-[#9A4E1B] text-white px-1.5 rounded-full font-black">
-                  New
-                </span>
-              </Link>
-              <Link
                 href="/shop"
-                className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full text-[#5C4047] hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors"
+                className="text-sm font-semibold text-[#575153] hover:text-[#E05D78] transition-colors"
               >
-                Shop
+                All Products
               </Link>
               <Link
-                href="/#contact"
-                className="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full text-[#5C4047] hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors"
+                href="/account"
+                className="text-sm font-semibold text-[#575153] hover:text-[#E05D78] transition-colors"
               >
-                Contact
+                Track Order
+              </Link>
+              <Link
+                href="/contact"
+                className="text-sm font-semibold text-[#575153] hover:text-[#E05D78] transition-colors"
+              >
+                Contact Us
               </Link>
             </nav>
 
             {/* Right Action Icons (Matches Screenshot) */}
-            <div className="flex items-center gap-2">
-              {/* Shop Goodies Pill Button */}
-              <Link
-                href="/shop"
-                className="hidden sm:inline-flex items-center gap-1.5 py-2 px-4 rounded-full bg-gradient-to-r from-[#F67B92] to-[#EE6580] hover:from-[#EE6580] hover:to-[#D9536E] text-white font-bold text-[11px] uppercase tracking-wider shadow-sm hover:shadow-md transition-all shrink-0"
-              >
-                <span>Shop Goodies</span>
-                <span>♡</span>
-              </Link>
-
+            <div className="flex items-center gap-3">
               {/* Search Toggle */}
               <button
                 onClick={() => setSearchOpen((v) => !v)}
                 aria-label="Search"
-                className="w-9 h-9 flex items-center justify-center rounded-full border border-pink-200 bg-white text-gray-600 hover:bg-pink-50 hover:text-[#FF7096] transition-colors"
+                className="w-9 h-9 flex items-center justify-center rounded-full text-gray-700 hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors cursor-pointer"
               >
-                <Search size={16} />
+                <Search size={18} />
               </button>
 
               {/* Wishlist Link */}
               <Link
                 href="/wishlist"
                 aria-label="Wishlist"
-                className="relative w-9 h-9 flex items-center justify-center rounded-full border border-pink-200 bg-white text-gray-600 hover:bg-pink-50 hover:text-[#FF7096] transition-colors"
+                className="relative w-9 h-9 flex items-center justify-center rounded-full text-gray-700 hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors"
               >
-                <Heart size={16} />
-                {mounted && wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#FF7096] text-white text-[9px] font-bold flex items-center justify-center shadow-xs">
-                    {wishlistCount}
-                  </span>
-                )}
+                <Heart size={18} />
+                <span className="absolute -top-0.5 -right-0.5 text-[10px] font-bold text-gray-500">
+                  {mounted ? wishlistCount : 0}
+                </span>
               </Link>
 
-              {/* User Account Button (Dynamic login / profile indicator) */}
+              {/* User Account Button */}
               <Link
                 href={isAuthenticated ? "/account" : "/login"}
                 aria-label={isAuthenticated ? "Account" : "Sign In"}
                 title={isAuthenticated ? (user?.name ? `${user.name}'s Account` : "My Account") : "Sign In"}
-                className={`w-9 h-9 flex items-center justify-center rounded-full border transition-all text-xs font-bold ${
-                  mounted && isAuthenticated
-                    ? "border-[#FF7096] bg-pink-50 text-[#FF7096] shadow-xs"
-                    : "border-pink-200 bg-white text-gray-600 hover:bg-pink-50 hover:text-[#FF7096]"
-                }`}
+                className="w-9 h-9 flex items-center justify-center rounded-full text-gray-700 hover:text-[#E05D78] hover:bg-pink-50/60 transition-colors text-xs font-bold"
               >
                 {mounted && isAuthenticated && user?.name ? (
-                  <span>{user.name.charAt(0).toUpperCase()}</span>
+                  <span className="w-6 h-6 rounded-full bg-[#E05D78] text-white flex items-center justify-center text-[11px]">
+                    {user.name.charAt(0).toUpperCase()}
+                  </span>
                 ) : (
-                  <User size={16} />
+                  <User size={18} />
                 )}
               </Link>
 
-              {/* Cart Button (Solid Pink Circle with Shopping Bag Icon) */}
-              <Link href="/cart" aria-label="Cart" className="relative">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm bg-gradient-to-r from-[#FFA0B4] to-[#FF7096] hover:scale-105 transition-transform">
-                  {mounted && totalItems > 0 ? (
-                    <motion.span
-                      key={totalItems}
-                      initial={{ scale: 0.5 }}
-                      animate={{ scale: 1 }}
-                    >
-                      {totalItems}
-                    </motion.span>
-                  ) : (
-                    <ShoppingBag size={16} />
-                  )}
+              {/* Cart Button (Theme Matching Filled Rose Circle with Bag & Badge) */}
+              <Link href="/cart" aria-label="Cart" className="relative group">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-white bg-gradient-to-r from-[#F67B92] to-[#E05D78] hover:from-[#EE6580] hover:to-[#C23D5B] transition-colors shadow-xs">
+                  <ShoppingBag size={16} />
                 </div>
+                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-[#E05D78] text-white border-2 border-white text-[9px] font-bold flex items-center justify-center shadow-xs">
+                  {mounted ? totalItems : 0}
+                </span>
               </Link>
 
               {/* Mobile Menu Hamburger */}

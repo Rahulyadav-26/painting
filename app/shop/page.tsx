@@ -9,12 +9,12 @@ import ProductCard from "@/components/product/ProductCard";
 import { products } from "@/data/products";
 import type { ProductCategory, ProductMedium } from "@/types";
 
-const ALL_CATEGORIES: (ProductCategory | "All")[] = [
-  "All",
-  "Daily Planner",
-  "Notes",
-  "Stickers",
-  "Coloring pages",
+const ALL_CATEGORIES = [
+  { id: "All" as const, label: "All Products" },
+  { id: "Stickers" as const, label: "Stickers" },
+  { id: "Daily Planner" as const, label: "Planner" },
+  { id: "Coloring pages" as const, label: "Colouring Pages" },
+  { id: "Notes" as const, label: "Cozy Notes" },
 ];
 
 const ALL_MEDIUMS: (ProductMedium | "All")[] = [
@@ -197,19 +197,19 @@ function ShopContent() {
           </div>
         </div>
 
-        {/* Category Pills */}
+        {/* Category Pills — Matching Ordered Format */}
         <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-none mb-6">
           {ALL_CATEGORIES.map((cat) => (
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-                selectedCategory === cat
-                  ? "bg-[#FF69B4] text-white shadow-sm"
-                  : "bg-white text-gray-700 border border-pink-100 hover:bg-pink-50"
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                selectedCategory === cat.id
+                  ? "bg-gradient-to-r from-[#F67B92] to-[#E05D78] text-white shadow-xs"
+                  : "bg-white text-gray-700 border border-[#EBE8E3] hover:border-[#F67B92] hover:text-[#E05D78]"
               }`}
             >
-              {cat === "All" ? "✨ All Works" : cat}
+              {cat.label}
             </button>
           ))}
         </div>

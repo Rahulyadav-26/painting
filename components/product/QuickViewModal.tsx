@@ -78,7 +78,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
             </span>
 
             <h2
-              style={{ fontFamily: "var(--font-body)" }}
+              style={{ fontFamily: "var(--font-display)" }}
               className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug"
             >
               {product.title}
@@ -109,30 +109,35 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
               {product.description}
             </p>
 
-            <div className="flex items-center gap-1.5 mt-1">
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  product.isComingSoon
-                    ? "bg-[#FF7096] animate-pulse"
+            <div className="flex items-center justify-between gap-2 mt-1">
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    product.isComingSoon
+                      ? "bg-[#FF7096] animate-pulse"
+                      : product.inStock
+                      ? "bg-[#10B981]"
+                      : "bg-gray-400"
+                  }`}
+                />
+                <span
+                  className={`text-[11px] font-semibold ${
+                    product.isComingSoon
+                      ? "text-[#FF7096]"
+                      : product.inStock
+                      ? "text-[#10B981]"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {product.isComingSoon
+                    ? "Coming Soon — In Creation ✨"
                     : product.inStock
-                    ? "bg-[#10B981]"
-                    : "bg-gray-400"
-                }`}
-              />
-              <span
-                className={`text-[11px] font-semibold ${
-                  product.isComingSoon
-                    ? "text-[#FF7096]"
-                    : product.inStock
-                    ? "text-[#10B981]"
-                    : "text-gray-400"
-                }`}
-              >
-                {product.isComingSoon
-                  ? "Coming Soon — In Creation ✨"
-                  : product.inStock
-                  ? "In Stock — Ready to ship"
-                  : "Sold Out"}
+                    ? "In Stock — Ready to ship"
+                    : "Sold Out"}
+                </span>
+              </div>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-[#C23D5B] border border-rose-100">
+                No returns
               </span>
             </div>
 

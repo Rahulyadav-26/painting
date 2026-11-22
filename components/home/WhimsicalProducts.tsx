@@ -1,153 +1,87 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { motion } from "framer-motion";
-import { Heart, ArrowRight, Sparkles, BookOpen, FileText, Smile, Palette } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import ProductCard from "@/components/product/ProductCard";
+import { products } from "@/data/products";
+
+const CATEGORY_TABS = [
+  { id: "All", label: "All Products", title: "All Products", subtitle: "Explore our whimsical art & stationery collection ✨" },
+  { id: "Stickers", label: "Stickers", title: "Stickers", subtitle: "Our cutest picks, just for you 💕" },
+  { id: "Daily Planner", label: "Planner", title: "Daily Planners", subtitle: "Organize your days with warmth & intention 🗓️" },
+  { id: "Coloring pages", label: "Colouring Pages", title: "Colouring Pages", subtitle: "Relaxing storybook illustrations to bring to life 🎨" },
+  { id: "Notes", label: "Cozy Notes", title: "Cozy Notes", subtitle: "Charming note pages for sweet thoughts & journaling 📝" },
+];
 
 export default function WhimsicalProducts() {
-  const productCategories = [
-    {
-      id: "planner",
-      title: "Digital Planners",
-      badge: "Best Seller",
-      categoryName: "Planner",
-      desc: "Hourly time-blocking, meal planning, habit trackers & daily wellness templates for GoodNotes & print.",
-      price: "From $1",
-      image: "/images/products/autumn-daily-planner-aesthetic-flatlay.jpg",
-      href: "/product/autumn-harvest-digital-daily-planner",
-      icon: BookOpen,
-      accentColor: "#F67B92",
-      bgGradient: "from-[#FFF2F5] via-[#FFE8ED] to-[#FFDFE6]",
-    },
-    {
-      id: "stickers",
-      title: "Whimsical Stickers",
-      badge: "Now Available • ₹30",
-      categoryName: "Stickers",
-      desc: "Authentic hand-painted holiday stickers on premium vinyl. Water & scratch resistant—perfect for gifts and planners!",
-      price: "₹30 Only",
-      image: "/images/products/festive-christmas-stickers.jpg",
-      href: "/product/cozy-autumn-digital-sticker-sheet",
-      icon: Smile,
-      accentColor: "#FF8FAB",
-      bgGradient: "from-[#FFF5F8] via-[#FFEDF3] to-[#FFE0EB]",
-    },
-    {
-      id: "notes",
-      title: "Cozy Note Sheets",
-      badge: "Coming Soon",
-      categoryName: "Notes",
-      desc: "Charming lined, dotted and grid notepad stationery with sweet hand-drawn bunny & blossom margins.",
-      price: "From $4",
-      image: "/images/products/cozy-whimsical-notes-mockup.jpg",
-      href: "/product/cozy-whimsical-digital-note-sheets",
-      icon: FileText,
-      accentColor: "#9381FF",
-      bgGradient: "from-[#F7F5FF] via-[#EFEAFF] to-[#E5DEFF]",
-    },
-    {
-      id: "coloring-pages",
-      title: "Coloring Pages",
-      badge: "Coming Soon",
-      categoryName: "Coloring pages",
-      desc: "Relaxing fairytale forest cottages, floral gardens & friendly woodland animals to color and print.",
-      price: "From $4",
-      image: "/images/products/fairytale-coloring-pages-mockup.jpg",
-      href: "/product/fairytale-forest-printable-coloring-pages",
-      icon: Palette,
-      accentColor: "#E07A5F",
-      bgGradient: "from-[#FFF7F2] via-[#FFEDE2] to-[#FFE3D1]",
-    },
-  ];
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+
+  const currentTab = CATEGORY_TABS.find((t) => t.id === activeCategory) || CATEGORY_TABS[0];
+
+  const displayedProducts = products.filter((p) => {
+    if (activeCategory === "All") return true;
+    return p.category === activeCategory;
+  });
 
   return (
-    <section id="products" className="py-20 sm:py-24 bg-gradient-to-b from-[#FFF9F6] via-[#FFF3F5] to-[#FFF9F6] relative">
+    <section id="products" className="py-14 sm:py-20 bg-[#FAF9F5] text-[#221F20] relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#FCE5EB] text-[#C23D5B] text-[11px] font-bold uppercase tracking-widest mb-3">
-            <Heart size={10} className="fill-[#C23D5B]" />
-            OUR PRODUCTS ♡
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#3D272B] tracking-tight">
-            Digital &amp; Printable Goodies ♡
+        {/* Centered Title & Subtitle — Matching Screenshot */}
+        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1E1B1D]">
+            {currentTab.title}
           </h2>
-          <p className="text-xs sm:text-sm text-[#7D5B64] mt-2 font-sans">
-            Crafted with love to make your everyday journaling, studying, and creative moments magical.
+          <p className="text-sm sm:text-base text-[#575153] mt-2 font-normal">
+            {currentTab.subtitle}
           </p>
         </div>
 
-        {/* 4 Product Categories Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {productCategories.map((p, idx) => {
-            const Icon = p.icon;
+        {/* Horizontal Category Pill Filter Tabs — Matching Ordered Format */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-8 sm:mb-10 px-1">
+          {CATEGORY_TABS.map((tab) => {
+            const isActive = activeCategory === tab.id;
             return (
-              <motion.div
-                key={p.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: idx * 0.08 }}
-                className="group flex flex-col justify-between rounded-3xl bg-white border border-[#F8DCE2] shadow-sm hover:shadow-xl hover:border-[#F67B92] transition-all duration-300 overflow-hidden"
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveCategory(tab.id)}
+                className={`shrink-0 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                  isActive
+                    ? "bg-gradient-to-r from-[#F67B92] to-[#E05D78] text-white shadow-xs"
+                    : "bg-white text-[#4A4547] border border-[#EBE8E3] hover:border-[#F67B92] hover:text-[#E05D78]"
+                }`}
               >
-                {/* Image Showcase */}
-                <div className="relative aspect-square w-full overflow-hidden bg-[#FFF5F8]">
-                  <Image
-                    src={p.image}
-                    alt={p.title}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  {/* Floating Category Badge */}
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-full text-[10px] font-bold text-[#3D272B] shadow-xs flex items-center gap-1 border border-pink-100">
-                    <Icon size={12} className="text-[#E05D78]" />
-                    <span>{p.categoryName}</span>
-                  </div>
-                  {/* Price Tag Badge */}
-                  <div className="absolute bottom-3 right-3 bg-[#3D272B]/85 backdrop-blur-xs text-white px-2.5 py-1 rounded-full text-[11px] font-bold shadow-md">
-                    {p.price}
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-5 flex flex-col flex-1 justify-between space-y-4">
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#C23D5B]">
-                        {p.badge}
-                      </span>
-                      <Sparkles size={12} className="text-[#E05D78]" />
-                    </div>
-                    <h3 className="font-serif font-bold text-lg text-[#3D272B] group-hover:text-[#E05D78] transition-colors">
-                      {p.title}
-                    </h3>
-                    <p className="text-xs text-[#7A5A62] leading-relaxed line-clamp-2">
-                      {p.desc}
-                    </p>
-                  </div>
-
-                  <Link
-                    href={p.href}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#FFF0F4] hover:bg-[#F67B92] text-[#C23D5B] hover:text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors duration-200 mt-2"
-                  >
-                    <span>View Product</span>
-                    <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
-                </div>
-              </motion.div>
+                {tab.label}
+              </button>
             );
           })}
         </div>
 
-        {/* Bottom CTA Button */}
-        <div className="text-center mt-12">
+        {/* 4-Column Product Grid — Matching Screenshot */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeCategory}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
+          >
+            {displayedProducts.map((prod, idx) => (
+              <ProductCard key={prod.id} product={prod} index={idx} />
+            ))}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Bottom Link to Shop */}
+        <div className="text-center mt-12 sm:mt-14">
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 py-3.5 px-8 rounded-full bg-gradient-to-r from-[#F67B92] to-[#EE6580] hover:from-[#EE6580] hover:to-[#D9536E] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:scale-102 transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 py-3 px-7 rounded-xl bg-white border border-[#DCD7D0] hover:border-[#F67B92] text-[#2D2A2B] hover:text-[#E05D78] font-semibold text-xs sm:text-sm transition-all shadow-xs cursor-pointer"
           >
-            <span>EXPLORE ALL PRODUCTS</span>
+            <span>View All Atelier Goods</span>
             <ArrowRight size={14} />
           </Link>
         </div>

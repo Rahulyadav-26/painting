@@ -36,7 +36,9 @@ Daily Inspiration: A sweet motivational quote
 Product Details:
 WATERMARK FREE PLANNER
 Format: High-resolution digital file (instant download)
-Compatibility: Print at home, use on your tablet via annotation apps (like GoodNotes or Notability), or set as a desktop wallpaper.`,
+Compatibility: Print at home, use on your tablet via annotation apps (like GoodNotes or Notability), or set as a desktop wallpaper.
+
+No returns`,
     tags: [
       "daily planner",
       "digital planner",
@@ -74,7 +76,9 @@ Bring warmth and magic to your study sessions, journal entries, and creative bra
 What's Inside:
 • 3 Whimsical Note Page Designs: Lined Doodles, Dreamy Ideas Grid, and Notes & Whimsy Journal page
 • Soft pastel palette designed for comfortable day and night note-taking
-• High-resolution PDF files compatible with GoodNotes, Notability, and home printing.`,
+• High-resolution PDF files compatible with GoodNotes, Notability, and home printing.
+
+No returns`,
     tags: ["notes", "notepad", "goodnotes", "stationery", "digital paper", "cozy journaling"],
     rating: 4.9,
     reviewCount: 32,
@@ -82,7 +86,7 @@ What's Inside:
   {
     id: "3",
     title: "Whimsical Festive Holiday Sticker Pack",
-    slug: "cozy-autumn-digital-sticker-sheet",
+    slug: "whimsical-festive-holiday-sticker-pack",
     artist: "Minted Whimsy Atelier",
     category: "Stickers",
     medium: "Digital Printable / Tablet PDF",
@@ -107,7 +111,9 @@ Built to Last: Printed on premium, thick vinyl that resists water, fading, and s
 
 Versatile Use: Ideal for sealing Christmas cards, personalizing gift tags, or decorating laptops, tumblers, and planners.
 
-Great Stocking Stuffer: Lightweight, affordable, and festive for art lovers of all ages.`,
+Great Stocking Stuffer: Lightweight, affordable, and festive for art lovers of all ages.
+
+No returns`,
     tags: [
       "stickers",
       "digital stickers",
@@ -144,10 +150,59 @@ Unwind and spark your creativity with 15 storybook coloring pages filled with co
 What's Inside:
 • 15 High-resolution line art illustrations (300 DPI)
 • Print-ready A4 & US Letter format for colored pencils, watercolours, or markers
-• High-res transparent PNGs included for digital coloring in Procreate or tablet apps.`,
+• High-res transparent PNGs included for digital coloring in Procreate or tablet apps.
+
+No returns`,
     tags: ["coloring pages", "coloring book", "printable coloring", "cottagecore", "relaxing", "fairytale"],
     rating: 4.9,
     reviewCount: 41,
+  },
+  {
+    id: "5",
+    title: "Cozy Autumn Digital Sticker Sheet",
+    slug: "cozy-autumn-stickers-sheet",
+    artist: "Minted Whimsy Atelier",
+    category: "Stickers",
+    medium: "Digital Printable / Tablet PDF",
+    size: "Digital (A4 / US Letter / Tablet)",
+    price: 5,
+    salePrice: 1,
+    currency: "USD",
+    isNew: true,
+    inStock: true,
+    isComingSoon: false,
+    images: [
+      "/images/products/cozy-autumn-stickers-sheet.jpg",
+    ],
+    description: `Cozy Autumn Digital Sticker Sheet
+
+Bring the warmth and charm of the season straight to your digital planner, journal, or notes app with this hand-illustrated Cozy Autumn Sticker Pack! 
+
+Product Features
+Format: High-resolution digital PNG files. 
+
+Compatibility
+
+Instant Access: Download immediately after purchase and start decorating right away!
+
+Pack of 2 Sheet WATERMARK FREE
+
+Note: This is a digital product. No physical items will be shipped.
+
+No returns`,
+    tags: [
+      "stickers",
+      "digital stickers",
+      "autumn stickers",
+      "cozy stickers",
+      "goodnotes",
+      "notability",
+      "png stickers",
+      "fall aesthetic",
+      "planner stickers",
+    ],
+    rating: 5.0,
+    reviewCount: 46,
   },
 ];
 
@@ -164,7 +219,12 @@ export const getDailyPlanners = (): Product[] =>
   products.filter((p) => p.category === "Daily Planner" || p.category === "Planner");
 
 export const getProductBySlug = (slug: string): Product | undefined =>
-  products.find((p) => p.slug === slug || (slug === "blushing-peonies" && p.id === "1"));
+  products.find(
+    (p) =>
+      p.slug === slug ||
+      (slug === "blushing-peonies" && p.id === "1") ||
+      (slug === "cozy-autumn-digital-sticker-sheet" && p.id === "3")
+  );
 
 export const getProductsByCategory = (category: string): Product[] =>
   products.filter((p) => p.category === category);

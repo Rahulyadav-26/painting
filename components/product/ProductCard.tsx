@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Heart, ShoppingBag, Eye, Sparkles } from "lucide-react";
+import { Heart, ShoppingCart, Eye } from "lucide-react";
 import type { Product } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
@@ -22,20 +22,16 @@ export default function ProductCard({ product, index = 0, onQuickView }: Product
   const addToast = useToastStore((s) => s.addToast);
   const isWished = has(product.id);
 
-  /* Discount % */
-  const discountPct = product.salePrice
-    ? Math.round(((product.price - product.salePrice) / product.price) * 100)
-    : null;
-
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!product.inStock || product.isComingSoon) return;
     addItem(product);
-    addToast(`"${product.title}" added to your collection! 🎨`, "success");
+    addToast(`"${product.title}" added to cart! 💕`, "success");
   };
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     toggle(product.id);
     addToast(
       isWished ? "Removed from wishlist" : `"${product.title}" saved to your wishlist ♥`,
@@ -47,176 +43,105 @@ export default function ProductCard({ product, index = 0, onQuickView }: Product
     <motion.article
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: index * 0.05 }}
+      transition={{ duration: 0.3, delay: index * 0.04 }}
       className="h-full"
     >
-      <div className="card group flex flex-col h-full bg-white rounded-3xl p-3.5 border-[1.5px] border-[#FFD6E5] shadow-xs hover:shadow-xl hover:border-[#FFB6C1] transition-all duration-300">
+      <div className="group flex flex-col justify-between h-full bg-white rounded-2xl p-2.5 sm:p-3 border border-[#EBE8E3] shadow-xs hover:shadow-md transition-all duration-300">
         <Link href={`/product/${product.slug}`} className="block flex-1 flex flex-col">
-          {/* ── Image & Frame Wrapper ── */}
-          <div className="relative overflow-hidden rounded-2xl aspect-[4/5] bg-[#FDF5F8] mb-3.5 border border-pink-100/60">
+          {/* Image Container — Square & Clean like Moonie Loops */}
+          <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-[#F6F5F2] border border-[#F0ECE6]">
             <Image
               src={product.images[0]}
               alt={product.title}
               fill
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              className="object-cover transition-transform duration-300 ease-out group-hover:scale-103"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               loading="lazy"
             />
 
-            {/* Subtle Canvas Grain / Ambient Frame Vignette */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none opacity-60 group-hover:opacity-40 transition-opacity" />
-
-            {/* Top-left Badge: Coming Soon or Provenance */}
+            {/* Badge on Top-Left: Bestseller or Coming Soon */}
             {product.isComingSoon ? (
-              <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-gradient-to-r from-[#FF7096] to-[#E05D78] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md z-10 uppercase tracking-wider border border-white/30">
-                <Sparkles size={10} className="text-yellow-200" />
-                <span>Coming Soon</span>
-              </div>
+              <span className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-gray-100 text-gray-700 shadow-2xs">
+                Coming Soon
+              </span>
             ) : (
-              <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-white/95 backdrop-blur-md text-[#2B2329] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm z-10 uppercase tracking-wider border border-[#FFD6E5]">
-                <Sparkles size={10} className="text-[#FF7096]" />
-                <span>
-                  {product.category === "Daily Planner"
-                    ? "Digital Planner"
-                    : product.category === "Stickers"
-                    ? "Digital Stickers"
-                    : "Original 1 of 1"}
-                </span>
-              </div>
+              <span className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-[#FFE6EC] text-[#D6336C] shadow-2xs">
+                Bestseller
+              </span>
             )}
 
-            {/* Sale Ribbon Tag if applicable */}
-            {discountPct && (
-              <div className="absolute bottom-2.5 left-2.5 bg-[#FF5722] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm z-10 uppercase tracking-wider">
-                {discountPct}% OFF
-              </div>
-            )}
-
-            {/* Wishlist Heart Circle (Top-right) */}
+            {/* Wishlist Heart Button on Top-Right */}
             <motion.button
               whileTap={{ scale: 0.85 }}
               onClick={handleWishlist}
+              type="button"
               aria-label={isWished ? "Remove from wishlist" : "Add to wishlist"}
-              className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/95 backdrop-blur-md shadow-sm flex items-center justify-center transition-all duration-200 z-10 border border-[#FFD6E5] hover:border-[#FF7096]"
+              className="absolute top-2 right-2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/95 backdrop-blur-xs shadow-xs flex items-center justify-center transition-all duration-150 border border-white hover:border-pink-200"
             >
               <Heart
                 size={14}
                 className={
                   isWished
-                    ? "text-[#FF7096] fill-[#FF7096]"
-                    : "text-gray-400 hover:text-[#FF7096]"
+                    ? "text-[#E05D78] fill-[#E05D78]"
+                    : "text-gray-400 hover:text-[#E05D78]"
                 }
               />
             </motion.button>
 
-            {/* Hover Quick View Button */}
-            <div className="absolute inset-0 bg-black/25 backdrop-blur-[1px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (onQuickView) onQuickView(product);
-                  else window.location.href = `/product/${product.slug}`;
-                }}
-                className="btn-pill bg-white text-[#2B2329] hover:bg-[#FDE2EE] text-[11px] font-bold px-4 py-2 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-1.5"
-              >
-                <Eye size={12} className="text-[#FF7096]" />
-                {product.isComingSoon ? "Preview Details" : "Inspect Canvas"}
-              </button>
-            </div>
-
-            {/* Sold Out Overlay (only if out of stock and NOT coming soon) */}
-            {!product.inStock && !product.isComingSoon && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px] z-10">
-                <span className="text-xs font-bold uppercase tracking-wider rounded-full px-4 py-1.5 text-white bg-[#C2185B] shadow-md">
-                  Acquired / Sold
-                </span>
+            {/* Optional Quick View on Hover */}
+            {onQuickView && (
+              <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onQuickView(product);
+                  }}
+                  className="pointer-events-auto bg-white/90 backdrop-blur-xs text-xs font-semibold px-3 py-1.5 rounded-full text-gray-800 shadow-md hover:bg-white flex items-center gap-1.5"
+                >
+                  <Eye size={12} />
+                  <span>Quick View</span>
+                </button>
               </div>
             )}
           </div>
 
-          {/* ── Artwork Metadata Content ── */}
-          <div className="flex flex-col flex-1 text-left px-1">
-            {/* Artist & Medium Line */}
-            <p className="text-[11px] text-[#FF7096] font-semibold tracking-wide uppercase line-clamp-1 mb-1">
-              {product.artist}
-            </p>
-
-            {/* Painting Title */}
-            <h3
-              style={{ fontFamily: "var(--font-display)" }}
-              className="text-base font-bold text-[#2B2B2B] leading-snug line-clamp-1 group-hover:text-[#FF7096] transition-colors mb-1"
-              title={product.title}
-            >
+          {/* Product Details */}
+          <div className="pt-2.5 pb-1 flex flex-col flex-1">
+            <h3 className="font-semibold text-xs sm:text-sm text-[#221F20] line-clamp-1 group-hover:text-[#E05D78] transition-colors leading-snug">
               {product.title}
             </h3>
 
-            {/* Medium & Dimensions */}
-            <p className="text-xs text-[#8A7D7D] font-normal line-clamp-1 mb-2.5">
-              {product.medium} • {product.size}
-            </p>
-
-            {/* Price & Authenticity Row */}
-            <div className="mt-auto pt-2 border-t border-pink-100 flex items-center justify-between">
-              <div>
-                {product.salePrice ? (
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-gray-400 line-through">
-                      {formatPrice(product.price, product.currency)}
-                    </span>
-                    <span className="text-sm sm:text-base font-bold text-[#2B2B2B]">
-                      {formatPrice(product.salePrice, product.currency)}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-sm sm:text-base font-bold text-[#2B2B2B]">
-                    {formatPrice(product.price, product.currency)}
-                  </span>
-                )}
-              </div>
-
-              {product.isComingSoon ? (
-                <span className="text-[10px] font-bold text-[#C23D5B] bg-[#FFF0F4] border border-[#FFD6E5] px-2 py-0.5 rounded-md">
-                  Coming Soon
-                </span>
-              ) : (
-                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                  Certified
+            <div className="mt-1 mb-2.5 flex items-baseline gap-1.5">
+              <span className="text-sm sm:text-base font-bold text-[#1C181A]">
+                {formatPrice(product.salePrice ?? product.price, product.currency)}
+              </span>
+              {product.salePrice && product.salePrice < product.price && (
+                <span className="text-xs text-gray-400 line-through">
+                  {formatPrice(product.price, product.currency)}
                 </span>
               )}
             </div>
           </div>
         </Link>
 
-        {/* Action Button: Coming Soon Link or Add to Collection */}
-        {product.isComingSoon ? (
-          <Link
-            href={`/product/${product.slug}`}
-            className="w-full mt-3 py-2.5 px-4 rounded-full bg-gradient-to-r from-[#FFF0F4] to-[#FFE4EC] hover:from-[#FFE4EC] hover:to-[#FFD6E5] text-[#C23D5B] border border-[#F8BBD0] text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition-colors"
-          >
-            <Sparkles size={13} className="text-[#E05D78]" />
-            <span>Coming Soon</span>
-          </Link>
-        ) : (
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            onClick={handleAddToCart}
-            disabled={!product.inStock}
-            aria-label={`Add ${product.title} to cart`}
-            className="btn-pill btn-primary w-full mt-3 text-xs py-2.5 justify-center shadow-xs uppercase tracking-wider font-bold"
-            style={{
-              opacity: product.inStock ? 1 : 0.5,
-              cursor: product.inStock ? "pointer" : "not-allowed",
-            }}
-          >
-            <ShoppingBag size={13} />
-            {product.inStock
-              ? product.category === "Daily Planner" || product.category === "Planner"
-                ? "Get Planner"
-                : "Acquire Painting"
+        {/* Action Button: [ 🛒 Add to Cart ] full-width in website theme */}
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          disabled={!product.inStock || product.isComingSoon}
+          className="w-full py-2 sm:py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#F67B92] to-[#E05D78] hover:from-[#EE6580] hover:to-[#C23D5B] active:scale-[0.98] text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 shadow-xs transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ShoppingCart size={15} />
+          <span>
+            {product.isComingSoon
+              ? "Coming Soon"
+              : product.inStock
+              ? "Add to Cart"
               : "Sold Out"}
-          </motion.button>
-        )}
+          </span>
+        </button>
       </div>
     </motion.article>
   );
