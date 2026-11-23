@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { X, Heart, ShoppingCart, Sparkles } from "lucide-react";
@@ -15,6 +16,7 @@ interface QuickViewModalProps {
 }
 
 export default function QuickViewModal({ product, onClose }: QuickViewModalProps) {
+  const [deliveryOption, setDeliveryOption] = useState<"digital" | "physical">("digital");
   const addItem = useCartStore((s) => s.addItem);
   const { toggle, has } = useWishlistStore();
   const addToast = useToastStore((s) => s.addToast);
@@ -28,8 +30,11 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
 
   const handleAddToCart = () => {
     if (!product.inStock) return;
-    addItem(product);
-    addToast(`"${product.title}" added to cart! 🎨`, "success");
+    addItem(product, 1, deliveryOption);
+    addToast(
+      `"${product.title}" (${deliveryOption === "digital" ? "Digital Download" : "Physical Delivery"}) added to cart! 🎨`,
+      "success"
+    );
     onClose();
   };
 
@@ -140,6 +145,45 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                 No returns
               </span>
             </div>
+
+            {/* Delivery Medium Option in QuickView */}
+            {!product.isComingSoon && (
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setDeliveryOption("digital")}
+                  className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
+                    deliveryOption === "digital"
+                      ? "border-[#FF7096] bg-[#FFF0F4] ring-1 ring-[#FF7096]"
+                      : "border-gray-200 bg-gray-50/50 hover:bg-white"
+                  }`}
+                >
+                  <span className="text-[11px] font-bold text-gray-800 flex items-center gap-1">
+                    <span>📱</span> Digital PDF
+                  </span>
+                  <span className="text-[9px] text-gray-500 block leading-tight mt-0.5">
+                    Instant Download
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setDeliveryOption("physical")}
+                  className={`p-2 rounded-xl border text-left transition-all cursor-pointer ${
+                    deliveryOption === "physical"
+                      ? "border-[#FF7096] bg-[#FFF0F4] ring-1 ring-[#FF7096]"
+                      : "border-gray-200 bg-gray-50/50 hover:bg-white"
+                  }`}
+                >
+                  <span className="text-[11px] font-bold text-gray-800 flex items-center gap-1">
+                    <span>📦</span> Physical Print
+                  </span>
+                  <span className="text-[9px] text-gray-500 block leading-tight mt-0.5">
+                    Doorstep Courier
+                  </span>
+                </button>
+              </div>
+            )}
 
             <div className="flex items-center gap-3 pt-3">
               {product.isComingSoon ? (

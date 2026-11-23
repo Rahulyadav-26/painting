@@ -59,16 +59,19 @@ export interface Product {
 
 // ─── Cart / Wishlist Types ───────────────────────────────────────────────────
 
+export type DeliveryMedium = "digital" | "physical";
+
 export interface CartItem {
   product: Product;
   quantity: number;
+  deliveryOption?: DeliveryMedium;
 }
 
 export interface CartStore {
   items: CartItem[];
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addItem: (product: Product, quantity?: number, deliveryOption?: DeliveryMedium) => void;
+  removeItem: (productId: string, deliveryOption?: DeliveryMedium) => void;
+  updateQuantity: (productId: string, quantity: number, deliveryOption?: DeliveryMedium) => void;
   clearCart: () => void;
   totalItems: () => number;
   totalPrice: () => number;

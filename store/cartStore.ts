@@ -1,45 +1,63 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { CartStore, CartItem, Product } from "@/types";
+import type { CartStore, CartItem, Product, DeliveryMedium } from "@/types";
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
 
-      addItem: (product: Product, quantity = 1) => {
+      addItem: (product: Product, quantity = 1, deliveryOption: DeliveryMedium = "digital") => {
         const existing = get().items.find(
-          (i) => i.product.id === product.id
+          (i) =>
+            i.product.id === product.id &&
+            (i.deliveryOption || "digital") === deliveryOption
         );
         if (existing) {
           set((state) => ({
             items: state.items.map((i) =>
-              i.product.id === product.id
+              i.product.id === product.id &&
+              (i.deliveryOption || "digital") === deliveryOption
                 ? { ...i, quantity: i.quantity + quantity }
                 : i
             ),
           }));
         } else {
           set((state) => ({
-            items: [...state.items, { product, quantity }],
+            items: [...state.items, { product, quantity, deliveryOption }],
           }));
         }
       },
 
-      removeItem: (productId: string) =>
+      removeItem: (productId: string, deliveryOption?: DeliveryMedium) =>
         set((state) => ({
-          items: state.items.filter((i) => i.product.id !== productId),
+          items: state.items.filter((i) =>
+            deliveryOption
+              ? !(
+                  i.product.id === productId &&
+                  (i.deliveryOption || "digital") === deliveryOption
+                )
+              : i.product.id !== productId
+          ),
         })),
 
-      updateQuantity: (productId: string, quantity: number) => {
+      updateQuantity: (
+        productId: string,
+        quantity: number,
+        deliveryOption?: DeliveryMedium
+      ) => {
         if (quantity <= 0) {
-          get().removeItem(productId);
+          get().removeItem(productId, deliveryOption);
           return;
         }
         set((state) => ({
-          items: state.items.map((i) =>
-            i.product.id === productId ? { ...i, quantity } : i
-          ),
+          items: state.items.map((i) => {
+            const matches = deliveryOption
+              ? i.product.id === productId &&
+                (i.deliveryOption || "digital") === deliveryOption
+              : i.product.id === productId;
+            return matches ? { ...i, quantity } : i;
+          }),
         }));
       },
 

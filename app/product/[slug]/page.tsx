@@ -37,6 +37,7 @@ export default function ProductDetailPage({ params }: PageProps) {
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [deliveryOption, setDeliveryOption] = useState<"digital" | "physical">("digital");
   const [copied, setCopied] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
@@ -79,13 +80,16 @@ export default function ProductDetailPage({ params }: PageProps) {
 
   const handleAddToCart = () => {
     if (!product.inStock) return;
-    addItem(product, quantity);
-    addToast(`Added ${quantity} × "${product.title}" to your cart! 🎨`, "success");
+    addItem(product, quantity, deliveryOption);
+    addToast(
+      `Added ${quantity} × "${product.title}" (${deliveryOption === "digital" ? "Digital Download" : "Physical Delivery"}) to your cart! 🎨`,
+      "success"
+    );
   };
 
   const handleBuyNow = () => {
     if (!product.inStock) return;
-    addItem(product, quantity);
+    addItem(product, quantity, deliveryOption);
     if (!isAuthenticated) {
       addToast("Please sign in or create an account to complete your purchase", "info");
       router.push("/login?redirect=/checkout");
@@ -283,19 +287,80 @@ export default function ProductDetailPage({ params }: PageProps) {
                 <span>No returns</span>
               </div>
 
-              {/* Artwork Attributes Pills */}
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-white p-3 rounded-xl border border-pink-50">
-                  <span className="text-gray-400 block text-[10px] uppercase font-bold">
-                    Medium
+              {/* Delivery Medium Selector */}
+              <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-pink-100 shadow-xs space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-gray-800 flex items-center gap-1.5">
+                    <Sparkles size={13} className="text-[#FF7096]" />
+                    Choose Delivery Medium
                   </span>
-                  <span className="font-semibold text-gray-800">{product.medium}</span>
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-pink-50 text-[#C23D5B] border border-pink-100">
+                    {deliveryOption === "digital" ? "Instant Download" : "Doorstep Courier"}
+                  </span>
                 </div>
-                <div className="bg-white p-3 rounded-xl border border-pink-50">
-                  <span className="text-gray-400 block text-[10px] uppercase font-bold">
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setDeliveryOption("digital")}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                      deliveryOption === "digital"
+                        ? "border-[#FF7096] bg-[#FFF0F4] ring-2 ring-[#FF7096]/20 shadow-xs"
+                        : "border-gray-200 bg-gray-50/50 hover:bg-white hover:border-pink-200"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+                        <span>📱</span> Digital Delivery
+                      </span>
+                      {deliveryOption === "digital" && (
+                        <span className="w-4 h-4 rounded-full bg-[#FF7096] text-white flex items-center justify-center text-[10px] font-bold">
+                          ✓
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-gray-500 mt-1 leading-snug">
+                      Instant High-Res PDF & PNG • Printable • Zero shipping fee
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setDeliveryOption("physical")}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                      deliveryOption === "physical"
+                        ? "border-[#FF7096] bg-[#FFF0F4] ring-2 ring-[#FF7096]/20 shadow-xs"
+                        : "border-gray-200 bg-gray-50/50 hover:bg-white hover:border-pink-200"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+                        <span>📦</span> Physical Delivery
+                      </span>
+                      {deliveryOption === "physical" && (
+                        <span className="w-4 h-4 rounded-full bg-[#FF7096] text-white flex items-center justify-center text-[10px] font-bold">
+                          ✓
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-gray-500 mt-1 leading-snug">
+                      Handcrafted printed sheet • Courier to your doorstep
+                    </p>
+                  </button>
+                </div>
+              </div>
+
+              {/* Artwork Dimensions Pill */}
+              <div className="text-xs">
+                <div className="bg-white p-3 rounded-xl border border-pink-50 flex items-center justify-between">
+                  <span className="text-gray-400 text-[10px] uppercase font-bold">
                     Dimensions
                   </span>
-                  <span className="font-semibold text-gray-800">{product.size}</span>
+                  <span className="font-semibold text-gray-800">
+                    {deliveryOption === "digital"
+                      ? product.size
+                      : "Physical Sheet (A4 / 21×30 cm)"}
+                  </span>
                 </div>
               </div>
 
@@ -310,7 +375,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* Stock / Digital delivery status indicator */}
+              {/* Stock / Delivery status indicator */}
               <div className="flex items-center gap-2 text-xs">
                 <span
                   className={`w-2.5 h-2.5 rounded-full ${
@@ -324,11 +389,9 @@ export default function ProductDetailPage({ params }: PageProps) {
                 <span className="font-semibold text-gray-800">
                   {product.isComingSoon
                     ? "Coming Soon — Releasing Shortly ✨"
-                    : product.category === "Daily Planner"
-                    ? "Instant Digital Delivery — 100% Watermark Free"
-                    : product.inStock
-                    ? "Available Now — Ready to dispatch"
-                    : "Currently Out of Stock"}
+                    : deliveryOption === "digital"
+                    ? "Instant Digital Delivery — 100% Watermark Free (Direct Download & Email)"
+                    : "Physical Courier Delivery — Handcrafted & Dispatched in 24-48 hrs"}
                 </span>
               </div>
 

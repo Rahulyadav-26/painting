@@ -102,6 +102,13 @@ export default function CheckoutPage() {
     checkAuth();
   }, [checkAuth]);
 
+  // Auto-switch to Physical Delivery option if cart contains any physical item
+  useEffect(() => {
+    if (items.some((i) => i.deliveryOption === "physical")) {
+      setPaymentMethod("physical_delivery");
+    }
+  }, [items]);
+
   // Pre-fill user data once authenticated
   useEffect(() => {
     if (user) {
@@ -227,8 +234,8 @@ export default function CheckoutPage() {
                 ) : (
                   <>
                     <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
-                      {items.map(({ product, quantity }) => (
-                        <div key={product.id} className="flex items-center gap-3">
+                      {items.map(({ product, quantity, deliveryOption }) => (
+                        <div key={`${product.id}-${deliveryOption || "digital"}`} className="flex items-center gap-3">
                           <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-pink-50 border border-pink-100 shrink-0">
                             <Image
                               src={product.images[0]}
@@ -242,8 +249,12 @@ export default function CheckoutPage() {
                             <h4 className="text-xs font-semibold text-gray-900 truncate">
                               {product.title}
                             </h4>
-                            <p className="text-[11px] text-gray-500">
-                              by {product.artist} • Qty {quantity}
+                            <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
+                              <span>Qty {quantity}</span>
+                              <span>•</span>
+                              <span className={deliveryOption === "physical" ? "text-amber-700 font-semibold" : "text-[#FF7096] font-semibold"}>
+                                {deliveryOption === "physical" ? "📦 Physical" : "📱 Digital"}
+                              </span>
                             </p>
                           </div>
                           <span className="text-xs font-bold text-gray-800">
@@ -1072,8 +1083,8 @@ export default function CheckoutPage() {
 
                 {/* Items preview */}
                 <div className="flex flex-col gap-3 max-h-60 overflow-y-auto pr-1">
-                  {items.map(({ product, quantity }) => (
-                    <div key={product.id} className="flex items-center gap-3">
+                  {items.map(({ product, quantity, deliveryOption }) => (
+                    <div key={`${product.id}-${deliveryOption || "digital"}`} className="flex items-center gap-3">
                       <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-pink-50 border border-pink-100 shrink-0">
                         <Image
                           src={product.images[0]}
@@ -1087,8 +1098,12 @@ export default function CheckoutPage() {
                         <h4 className="text-xs font-semibold text-gray-900 truncate">
                           {product.title}
                         </h4>
-                        <p className="text-[11px] text-gray-500">
-                          Qty: {quantity} • {product.size}
+                        <p className="text-[11px] text-gray-500 flex items-center gap-1.5 mt-0.5">
+                          <span>Qty: {quantity}</span>
+                          <span>•</span>
+                          <span className={deliveryOption === "physical" ? "text-amber-700 font-semibold" : "text-[#FF7096] font-semibold"}>
+                            {deliveryOption === "physical" ? "📦 Physical" : "📱 Digital"}
+                          </span>
                         </p>
                       </div>
                       <span className="text-xs font-bold text-gray-800">

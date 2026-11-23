@@ -125,11 +125,12 @@ export default function CartPage() {
               <div className="lg:col-span-8 flex flex-col gap-4">
 
                 {/* Items List */}
-                {items.map(({ product, quantity }) => {
+                {items.map(({ product, quantity, deliveryOption }) => {
                   const unitPrice = product.salePrice ?? product.price;
+                  const itemKey = `${product.id}-${deliveryOption || "digital"}`;
                   return (
                     <div
-                      key={product.id}
+                      key={itemKey}
                       className="bg-white p-4 sm:p-5 rounded-2xl border border-pink-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-4 transition-all hover:border-pink-200"
                     >
                       {/* Product Thumbnail */}
@@ -148,16 +149,30 @@ export default function CartPage() {
 
                       {/* Product Info */}
                       <div className="flex-1 min-w-0">
-                        <span className="text-[10px] font-bold text-[#FF69B4] uppercase tracking-wider">
-                          {product.category}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-[#FF69B4] uppercase tracking-wider">
+                            {product.category}
+                          </span>
+                          <span
+                            className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                              deliveryOption === "physical"
+                                ? "bg-amber-50 text-amber-800 border border-amber-200"
+                                : "bg-pink-50 text-[#C23D5B] border border-pink-100"
+                            }`}
+                          >
+                            {deliveryOption === "physical"
+                              ? "📦 Physical Delivery"
+                              : "📱 Digital Download"}
+                          </span>
+                        </div>
                         <Link href={`/product/${product.slug}`}>
-                          <h3 className="font-semibold text-gray-900 text-sm sm:text-base hover:text-[#FF69B4] transition-colors truncate">
+                          <h3 className="font-semibold text-gray-900 text-sm sm:text-base hover:text-[#FF69B4] transition-colors truncate mt-0.5">
                             {product.title}
                           </h3>
                         </Link>
                         <p className="text-xs text-gray-500 mt-0.5">
-                          by {product.artist} • {product.size}
+                          by {product.artist} •{" "}
+                          {deliveryOption === "physical" ? "Physical Sheet (A4)" : product.size}
                         </p>
                         <p className="text-xs font-semibold text-gray-800 mt-1">
                           {formatPrice(unitPrice, product.currency)}
@@ -167,16 +182,16 @@ export default function CartPage() {
                       {/* Quantity Controls */}
                       <div className="flex items-center border border-pink-200 bg-[#FFF8F5] rounded-full px-3 py-1">
                         <button
-                          onClick={() => updateQuantity(product.id, quantity - 1)}
-                          className="text-gray-600 hover:text-[#FF69B4] px-1 font-bold text-sm"
+                          onClick={() => updateQuantity(product.id, quantity - 1, deliveryOption)}
+                          className="text-gray-600 hover:text-[#FF69B4] px-1 font-bold text-sm cursor-pointer"
                           aria-label="Decrease quantity"
                         >
                           -
                         </button>
                         <span className="px-3 font-semibold text-xs text-gray-800">{quantity}</span>
                         <button
-                          onClick={() => updateQuantity(product.id, quantity + 1)}
-                          className="text-gray-600 hover:text-[#FF69B4] px-1 font-bold text-sm"
+                          onClick={() => updateQuantity(product.id, quantity + 1, deliveryOption)}
+                          className="text-gray-600 hover:text-[#FF69B4] px-1 font-bold text-sm cursor-pointer"
                           aria-label="Increase quantity"
                         >
                           +
@@ -193,10 +208,13 @@ export default function CartPage() {
                       {/* Remove Button */}
                       <button
                         onClick={() => {
-                          removeItem(product.id);
-                          addToast(`Removed "${product.title}" from cart`, "info");
+                          removeItem(product.id, deliveryOption);
+                          addToast(
+                            `Removed "${product.title}" (${deliveryOption === "physical" ? "Physical" : "Digital"}) from cart`,
+                            "info"
+                          );
                         }}
-                        className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                        className="text-gray-400 hover:text-red-500 transition-colors p-1 cursor-pointer"
                         aria-label="Remove item"
                       >
                         <Trash2 size={16} />
