@@ -162,7 +162,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                     <span>📱</span> Digital PDF
                   </span>
                   <span className="text-[9px] text-gray-500 block leading-tight mt-0.5">
-                    Instant Download
+                    High-Res Files
                   </span>
                 </button>
 

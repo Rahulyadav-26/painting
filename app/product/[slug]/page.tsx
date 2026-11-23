@@ -294,9 +294,6 @@ export default function ProductDetailPage({ params }: PageProps) {
                     <Sparkles size={13} className="text-[#FF7096]" />
                     Choose Delivery Medium
                   </span>
-                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-pink-50 text-[#C23D5B] border border-pink-100">
-                    {deliveryOption === "digital" ? "Instant Download" : "Doorstep Courier"}
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
@@ -320,7 +317,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                       )}
                     </div>
                     <p className="text-[10px] text-gray-500 mt-1 leading-snug">
-                      Instant High-Res PDF & PNG • Printable • Zero shipping fee
+                      High-Res PDF & PNG • Printable • Zero shipping fee
                     </p>
                   </button>
 
@@ -390,7 +387,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                   {product.isComingSoon
                     ? "Coming Soon — Releasing Shortly ✨"
                     : deliveryOption === "digital"
-                    ? "Instant Digital Delivery — 100% Watermark Free (Direct Download & Email)"
+                    ? "Digital Edition — 100% Watermark Free (Direct Download & Email)"
                     : "Physical Courier Delivery — Handcrafted & Dispatched in 24-48 hrs"}
                 </span>
               </div>
@@ -483,7 +480,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                     <div className="flex items-center gap-3 text-xs text-gray-700">
                       <Truck size={16} className="text-[#984A1A] shrink-0" />
                       <span>
-                        <strong>Instant Download</strong>: High-resolution file delivered immediately to your email.
+                        <strong>Digital Delivery</strong>: High-resolution file delivered immediately to your email.
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-700">

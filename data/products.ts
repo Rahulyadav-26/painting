@@ -169,7 +169,7 @@ No returns`,
     medium: "Digital Printable / Tablet PDF",
     size: "Digital (A4 / US Letter / Tablet)",
     price: 450,
-    salePrice: 90,
+    salePrice: 80,
     currency: "INR",
     isNew: true,
     inStock: true,
@@ -182,15 +182,11 @@ No returns`,
 Bring the warmth and charm of the season straight to your digital planner, journal, or notes app with this hand-illustrated Cozy Autumn Sticker Pack! 
 
 Product Features
-Format: High-resolution digital PNG files. 
+Format: High-resolution digital PNG files & physical printed sheets.
 
 Compatibility
 
-Instant Access: Download immediately after purchase and start decorating right away!
-
 Pack of 2 Sheet WATERMARK FREE
-
-Note: This is a digital product. No physical items will be shipped.
 
 No returns`,
     tags: [
