@@ -341,7 +341,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                       )}
                     </div>
                     <p className="text-[10px] text-gray-500 mt-1 leading-snug">
-                      Handcrafted printed sheet • Courier to your doorstep
+                      Handcrafted printed sheet • +₹80 courier delivery
                     </p>
                   </button>
                 </div>

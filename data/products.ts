@@ -94,7 +94,7 @@ No returns`,
     medium: "Digital Printable / Tablet PDF",
     size: "Digital (A4 / US Letter / Tablet)",
     price: 150,
-    salePrice: 30,
+    salePrice: 50,
     currency: "INR",
     isNew: true,
     inStock: true,
@@ -203,6 +203,48 @@ No returns`,
     rating: 5.0,
     reviewCount: 46,
   },
+  {
+    id: "6",
+    title: "Cozy Winter Watercolor Sticker Sheet | Physical & Digital – Minted Whimsy",
+    slug: "cozy-winter-watercolor-sticker-sheet",
+    artist: "Minted Whimsy Atelier",
+    category: "Stickers",
+    medium: "Digital Printable / Tablet PDF",
+    size: "Digital (A4 / US Letter / Tablet)",
+    price: 299,
+    salePrice: 99,
+    currency: "INR",
+    isNew: true,
+    inStock: true,
+    isComingSoon: false,
+    images: [
+      "/images/products/cozy-winter-watercolor-sticker-sheet.jpg",
+    ],
+    description: `Physical Sticker Sheet:
+The painting of the stickers took 5 hours and painted with professional colors and High Quality Paper
+
+Professionally printed on high-quality matte/glossy sticker paper (edit paper finish as needed) with crisp kiss-cut edges, ready to peel and stick into your bullet journal, planner, scrapbook, or snail mail.
+
+Digital Sticker Pack (Instant Download): Includes individual high-resolution PNG files with transparent backgrounds, pre-cropped and ready to use in GoodNotes, Notability, Procreate, and other digital planning apps.
+
+No returns`,
+    tags: [
+      "stickers",
+      "winter stickers",
+      "watercolor stickers",
+      "physical stickers",
+      "digital stickers",
+      "cozy winter",
+      "bullet journal",
+      "goodnotes",
+      "notability",
+      "procreate",
+      "kiss-cut stickers",
+      "planner stickers",
+    ],
+    rating: 5.0,
+    reviewCount: 38,
+  },
 ];
 
 export const getFeaturedProducts = (): Product[] =>
@@ -222,7 +264,8 @@ export const getProductBySlug = (slug: string): Product | undefined =>
     (p) =>
       p.slug === slug ||
       (slug === "blushing-peonies" && p.id === "1") ||
-      (slug === "cozy-autumn-digital-sticker-sheet" && p.id === "3")
+      (slug === "cozy-autumn-digital-sticker-sheet" && p.id === "3") ||
+      (slug === "cozy-winter-sticker-sheet" && p.id === "6")
   );
 
 export const getProductsByCategory = (category: string): Product[] =>
